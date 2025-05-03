@@ -1,0 +1,7 @@
+{
+  "name": "alertaya",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

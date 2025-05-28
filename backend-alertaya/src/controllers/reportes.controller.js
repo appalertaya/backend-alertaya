@@ -10,6 +10,7 @@ const getReportes = (req, res) => {
   radio = parseFloat(radio);
 
   const query = 'SELECT * FROM reportes';
+  
 
   db.getConnection((err, connection) => {
     if (err) {

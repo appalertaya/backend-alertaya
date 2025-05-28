@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ViewChild, ElementRef, OnInit } from '@angula
 import { GoogleMap } from '@capacitor/google-maps';
 import { GeolocationService } from 'src/app/services/geolocalizacion.service';
 import { PermisosGPSInternetService } from 'src/app/services/permisos.service';
+import { ReporteService } from 'src/app/services/reporte.service';
 
 interface Reporte {
   lat: number;
@@ -9,6 +10,7 @@ interface Reporte {
   categoria: string;
   descripcion: string;
 }
+
 
 @Component({
   selector: 'app-mapa',
@@ -20,10 +22,24 @@ interface Reporte {
 export class MapaPage implements AfterViewInit {
   newMap?: GoogleMap;
   cargandoMapa: boolean = true;
+  // categorias
+  categoriasSeleccionadas: string[] = [];
+  todasCategorias: string[] = [
+    'Corte de luz',
+    'Corte de agua',
+    'Semáforo en mal estado',
+    'Paradero dañado',
+    'Alumbrado público',
+    'Fuga o filtración',
+    'Calzada o vereda rota',
+    'Otros'
+  ];
+
 
   constructor(
     private geoService: GeolocationService,
-    private permisosService: PermisosGPSInternetService
+    private permisosService: PermisosGPSInternetService,
+    private reporteService: ReporteService
   ) { }
 
   async ngAfterViewInit() {
@@ -65,6 +81,8 @@ export class MapaPage implements AfterViewInit {
         }
       });
 
+      this.cargarReportes(); // cargar reportes
+
       // Forzamos redimensionamiento del mapa
       setTimeout(() => {
         window.dispatchEvent(new Event('resize'));
@@ -84,6 +102,70 @@ export class MapaPage implements AfterViewInit {
       this.newMap = undefined;
     }
   }
+
+  async cargarReportes() {
+    const params: any = {};
+    if (this.categoriasSeleccionadas.length === 1) {
+      params.categoria = this.categoriasSeleccionadas[0];
+    }
+
+    try {
+      const reportes = await this.reporteService.getReportesDesdeBackend(params).toPromise();;
+
+      if (Array.isArray(reportes)) {
+        await this.mostrarMarcadores(reportes);
+      } else {
+        console.warn('No se recibieron reportes válidos:', reportes);
+      }
+
+    } catch (err) {
+      console.error('Error al cargar reportes:', err);
+    }
+  }
+
+
+
+  async mostrarMarcadores(reportes: any[]) {
+    for (const rep of reportes) {
+      try {
+        await this.newMap?.addMarker({
+          coordinate: {
+            lat: parseFloat(rep.lat),
+            lng: parseFloat(rep.lng),
+          },
+          title: rep.categoria,
+          snippet: rep.descripcion,
+          iconUrl: this.getIconoPorCategoria(rep.categoria),
+        });
+      } catch (err) {
+        console.warn('Error al agregar marcador:', err);
+      }
+    }
+  }
+
+
+
+  getIconoPorCategoria(categoria: string): string {
+    switch (categoria.toLowerCase()) {
+      case 'corte de luz':
+        return 'assets/iconos/logoLuz.png';
+      case 'corte de agua':
+        return 'assets/iconos/logoAgua.png';
+      case 'semáforo en mal estado':
+        return 'assets/iconos/logoSemaforo.png';
+      case 'paradero dañado':
+        return 'assets/iconos/logoParadero.png';
+      case 'alumbrado público':
+        return 'assets/iconos/logoAlumbrado.png';
+      case 'fuga o filtración':
+        return 'assets/iconos/logoFuga.png';
+      case 'calzada o vereda rota':
+        return 'assets/iconos/logoCalzada.png';
+      default:
+        return 'assets/iconos/logoOtro.png'; // ícono por defecto
+    }
+  }
+
 
   distanciaEnKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
     const R = 6371;

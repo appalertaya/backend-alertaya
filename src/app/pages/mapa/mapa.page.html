@@ -7,6 +7,21 @@
   </ion-toolbar>
 </ion-header>
 
+<!-- categorias -->
+<ion-item>
+  <ion-label>Categorías</ion-label>
+  <ion-select
+    [(ngModel)]="categoriasSeleccionadas"
+    multiple
+    interface="popover"
+    placeholder="Todas"
+    (ionChange)="cargarReportes()"
+  >
+    <ion-select-option *ngFor="let cat of todasCategorias" [value]="cat">{{ cat }}</ion-select-option>
+  </ion-select>
+</ion-item>
+
+
 <ion-content fullscreen>
   <!-- spinner -->
   <ion-content fullscreen>

@@ -1,9 +1,19 @@
-import type { CapacitorConfig } from '@capacitor/cli';
 
-const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'alertaya',
-  webDir: 'www'
+const config = {
+  appId: 'com.alertaya.app',
+  appName: 'AlertaYa',
+  webDir: 'www',
+  bundledWebRuntime: false,
+  server: {
+    androidScheme: 'http',
+    cleartext: true
+  },  
+  plugins: {
+    GoogleMaps: {
+      apiKey: 'AIzaSyCLwen821H_u_cWDcKQvamibkaiEiTUySs',
+      forceUseLiteMode: false
+    }
+  }
 };
 
 export default config;

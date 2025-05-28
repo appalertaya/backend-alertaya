@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Mapa de Reportes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <!-- spinner -->
+  <ion-content fullscreen>
+    <div *ngIf="cargandoMapa" class="overlay-spinner">
+      <ion-spinner name="crescent" class="spinner-centro"></ion-spinner>
+    </div>
+    <div id="map"></div>
+  </ion-content>
+
+  <!-- mapa -->
+  <capacitor-google-map id="map"></capacitor-google-map>
+</ion-content>

@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Historial de reportes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-label>Filtrar por categoría</ion-label>
+    <ion-select [(ngModel)]="filtroCategoria" interface="popover" placeholder="Todas">
+      <ion-select-option value="">Todas</ion-select-option>
+      <ion-select-option *ngFor="let cat of categorias" [value]="cat">
+        {{ cat }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-card *ngFor="let reporte of reportesFiltrados; let i = index">
+    <ion-chip color="primary" *ngIf="reporte.categoria">
+      <ion-icon name="pricetag-outline" slot="start"></ion-icon>
+      {{ reporte.categoria }}
+    </ion-chip>
+
+    <ion-card-header>
+      <ion-card-title>{{ reporte.ciudad }}</ion-card-title>
+      <ion-card-subtitle>{{ reporte.fechaHora }}</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
+      <p><strong>Lat:</strong> {{ reporte.lat }} <strong>Lng:</strong> {{ reporte.lng }}</p>
+
+      <ion-button color="danger" fill="clear" size="small" (click)="eliminarReporte(reporte)">
+        <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+
+      <ion-chip color="success" *ngIf="reporte.enviado">
+        <ion-icon name="checkmark-circle-outline" color="light" slot="start"></ion-icon>
+        Enviado
+      </ion-chip>
+
+      <ion-chip color="warning" *ngIf="!reporte.enviado">
+        <ion-icon name="time-outline" color="light" slot="start"></ion-icon>
+        Pendiente
+      </ion-chip>
+    </ion-card-content>
+  </ion-card>
+
+
+  <ion-text color="medium" *ngIf="reportes.length === 0">
+    <p>No hay reportes guardados aún.</p>
+  </ion-text>
+</ion-content>

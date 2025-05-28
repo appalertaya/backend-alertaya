@@ -1,0 +1,76 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Reporte de corte</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-spinner name="crescent" *ngIf="cargando && !error" style="display: block; margin: 2rem auto;"></ion-spinner>
+
+  <ion-card *ngIf="!gpsListo && !cargando">
+    <ion-card-header>
+      <ion-card-title>Ubicación requerida</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      {{ error }}
+      <ion-button expand="block" (click)="reintentarVerificacion()">Reintentar</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Tarjeta con formulario y mini mapa -->
+  <form (ngSubmit)="enviarReporte()" #form="ngForm" *ngIf="gpsListo">
+    <ion-item>
+      <ion-label position="floating">Categoría</ion-label>
+      <ion-select [(ngModel)]="categoriaSeleccionada" name="categoria" required>
+        <ion-select-option value="Corte de luz">Corte de luz</ion-select-option>
+        <ion-select-option value="Corte de agua">Corte de agua</ion-select-option>
+        <ion-select-option value="Semáforo en mal estado">Semáforo en mal estado</ion-select-option>
+        <ion-select-option value="Paradero dañado">Paradero dañado</ion-select-option>
+        <ion-select-option value="Alumbrado público">Alumbrado público</ion-select-option>
+        <ion-select-option value="Fuga o filtración">Fuga o filtración</ion-select-option>
+        <ion-select-option value="Calzada o vereda rota">Calzada o vereda rota</ion-select-option>
+        <ion-select-option value="Otros">Otros</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Descripción del corte</ion-label>
+      <ion-textarea [(ngModel)]="descripcion" name="descripcion" required></ion-textarea>
+    </ion-item>
+
+    <ion-item *ngIf="ubicacion">
+      <ion-label>Ubicación actual</ion-label>
+      <ion-text>
+        {{ ubicacion.lat }}, {{ ubicacion.lng }}
+      </ion-text>
+    </ion-item>
+
+    <ion-button expand="block" type="submit" [disabled]="!ubicacion">
+      Enviar reporte
+    </ion-button>
+  </form>
+
+  <!-- Mini mapa -->
+  <ion-card *ngIf="ubicacion">
+    <ion-card-header>
+      <ion-card-title>Vista previa en el mapa</ion-card-title>
+    </ion-card-header>
+    <ion-card-content style="padding: 0;">
+      <div style="height: 200px; width: 100%;">
+        <iframe [src]="mapaPreviewUrl | safeUrl" width="100%" height="200" style="border:0;" loading="lazy"
+          allowfullscreen referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+
+      <ion-button expand="block" routerLink="/mapa">
+        Ver Mapa Completo
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

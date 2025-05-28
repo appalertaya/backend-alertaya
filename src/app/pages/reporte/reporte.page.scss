@@ -1,0 +1,41 @@
+::ng-deep capacitor-google-map {
+  width: 100%;
+  height: 200px;
+  display: block;
+  position: relative;
+  z-index: 11;
+  background: transparent !important;
+  visibility: visible !important;
+}
+
+capacitor-google-map {
+  display: block;
+  background: transparent !important;
+  z-index: 11;
+}
+
+#mini-map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 10; 
+  background: transparent;
+  border: 2px dashed red;
+}
+
+// ion-content {
+//   --background: var(--ion-background-color, #121212);
+//   background: var(--ion-background-color, #121212);
+// }
+
+ion-content {
+  --background: var(--ion-background-color, #ffffff) !important;
+  background: var(--ion-background-color, #ffffff) !important;
+}
+
+ion-card-content {
+  position: relative;
+}
+

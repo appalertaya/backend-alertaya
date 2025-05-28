@@ -1,0 +1,48 @@
+/* Estilo del componente de Google Map */
+::ng-deep capacitor-google-map {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 0;
+  background: transparent !important;
+}
+
+/* Fondo transparente para que el mapa nativo se vea correctamente */
+ion-content {
+  --background: transparent;
+  background: transparent !important;
+}
+
+/* Asegura que el div con id="map" ocupe todo el espacio */
+#map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+
+/* Spinner centrado mientras carga el mapa */
+.spinner-centro {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  z-index: 10;
+}
+
+.overlay-spinner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.6); 
+}

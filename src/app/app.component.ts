@@ -17,7 +17,7 @@ export class AppComponent {
   async ngOnInit() {
     await this.configService.loadConfig();
     environment.backendUrl = this.configService.backendUrl;
-    console.log('🌐 URL final del backend:', environment.backendUrl);
+    console.log('URL final del backend:', environment.backendUrl);
     this.reporteService.sincronizarReportesPendientes();
   }
 

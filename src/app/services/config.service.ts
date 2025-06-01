@@ -16,6 +16,6 @@ export class ConfigService {
       await Preferences.set({ key: 'backend_url', value: this.backendUrl });
     }
 
-    console.log('🛠️ Configuración cargada. URL backend:', this.backendUrl);
+    console.log('Configuración cargada. URL backend:', this.backendUrl);
   }
 }

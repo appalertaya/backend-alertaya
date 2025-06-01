@@ -34,7 +34,8 @@ export class MapaPage implements AfterViewInit {
     'Calzada o vereda rota',
     'Otros'
   ];
-
+  radioKmSeleccionado: number = 2;
+  private marcadores: string[] = [];
 
   constructor(
     private geoService: GeolocationService,
@@ -77,7 +78,8 @@ export class MapaPage implements AfterViewInit {
             lat: ubicacion.lat,
             lng: ubicacion.lon
           },
-          zoom: 15
+          zoom: 15,
+          // zoomGesturesEnabled: true,
         }
       });
 
@@ -92,7 +94,6 @@ export class MapaPage implements AfterViewInit {
 
       console.log('Mapa creado en:', ubicacion.lat, ubicacion.lon);
 
-      await this.mostrarReportesCercanos(ubicacion.lat, ubicacion.lon);
     }, 500); // Pequeña espera para asegurar que el div esté listo
   }
 
@@ -105,12 +106,31 @@ export class MapaPage implements AfterViewInit {
 
   async cargarReportes() {
     const params: any = {};
+
+    const ubicacion = await this.geoService.getCurrentPosition();
+    if (!ubicacion) {
+      console.warn('No se pudo obtener la ubicación');
+      return;
+    }
+
+    await this.newMap?.addMarker({ // añadir mi ubicacion con logo 
+      coordinate: { lat: ubicacion.lat, lng: ubicacion.lon },
+      title: 'Mi ubicación',
+      iconUrl: 'assets/iconos/logoYo.png',
+      iconSize: { width: 36, height: 36 }
+    });
+
+
+    params.lat = ubicacion.lat;
+    params.lng = ubicacion.lon;
+    params.radio = this.radioKmSeleccionado;
+
     if (this.categoriasSeleccionadas.length === 1) {
       params.categoria = this.categoriasSeleccionadas[0];
     }
 
     try {
-      const reportes = await this.reporteService.getReportesDesdeBackend(params).toPromise();;
+      const reportes = await this.reporteService.getReportesDesdeBackend(params).toPromise();
 
       if (Array.isArray(reportes)) {
         await this.mostrarMarcadores(reportes);
@@ -123,12 +143,46 @@ export class MapaPage implements AfterViewInit {
     }
   }
 
-
+  distanciaEnKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
 
   async mostrarMarcadores(reportes: any[]) {
+
+    // Eliminar marcadores anteriores
+    for (const id of this.marcadores) {
+      await this.newMap?.removeMarker(id);
+    }
+    this.marcadores = [];
+
+    // Agregar marcador de tu ubicación primero
+    const ubicacion = await this.geoService.getCurrentPosition();
+    if (ubicacion) {
+      const marcadorId = await this.newMap?.addMarker({
+        coordinate: { lat: ubicacion.lat, lng: ubicacion.lon },
+        title: 'Mi ubicación',
+        iconUrl: 'assets/iconos/logoYo.png',
+        iconSize: { width: 36, height: 36 }
+      });
+
+      if (marcadorId) {
+        this.marcadores.push(marcadorId);
+      }
+    }
+
+    // Agregar nuevos marcadores de reportes
     for (const rep of reportes) {
       try {
-        await this.newMap?.addMarker({
+        const marcadorId = await this.newMap?.addMarker({
           coordinate: {
             lat: parseFloat(rep.lat),
             lng: parseFloat(rep.lng),
@@ -136,14 +190,24 @@ export class MapaPage implements AfterViewInit {
           title: rep.categoria,
           snippet: rep.descripcion,
           iconUrl: this.getIconoPorCategoria(rep.categoria),
+          iconSize: { width: 32, height: 32 }
         });
+
+        if (marcadorId) {
+          this.marcadores.push(marcadorId);
+        }
+
       } catch (err) {
         console.warn('Error al agregar marcador:', err);
       }
     }
   }
 
-
+  reiniciarFiltros() {
+    this.categoriasSeleccionadas = [];
+    this.radioKmSeleccionado = 2;
+    this.cargarReportes();
+  }
 
   getIconoPorCategoria(categoria: string): string {
     switch (categoria.toLowerCase()) {
@@ -162,54 +226,7 @@ export class MapaPage implements AfterViewInit {
       case 'calzada o vereda rota':
         return 'assets/iconos/logoCalzada.png';
       default:
-        return 'assets/iconos/logoOtro.png'; // ícono por defecto
-    }
-  }
-
-
-  distanciaEnKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos(lat1 * Math.PI / 180) *
-      Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon / 2) ** 2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  }
-
-  async mostrarReportesCercanos(lat: number, lng: number) {
-    const radioKm = 2;
-
-    // 🔁 Reemplaza esto con tus datos reales desde el backend o servicio
-    const todosLosReportes: Reporte[] = [
-      { lat: lat + 0.01, lng: lng + 0.01, categoria: 'Corte de luz', descripcion: 'Sin luz en la cuadra' },
-      { lat: lat + 0.03, lng: lng + 0.01, categoria: 'Fuga de agua', descripcion: 'Agua brotando de vereda' },
-      { lat: lat - 0.008, lng: lng - 0.01, categoria: 'Semáforo dañado', descripcion: 'No funciona semáforo' },
-    ];
-
-    const cercanos = todosLosReportes.filter(r => {
-      const distancia = this.distanciaEnKm(lat, lng, r.lat, r.lng);
-      return distancia <= radioKm;
-    });
-
-    // Mi ubicacion
-    await this.newMap?.addMarker({
-      coordinate: { lat, lng },
-      title: 'Mi ubicación',
-      iconUrl: '/assets/icon/yo.png'
-    });
-
-    // Reportes cercanos
-    for (const r of cercanos) {
-      await this.newMap?.addMarker({
-        coordinate: { lat: r.lat, lng: r.lng },
-        title: r.categoria,
-        snippet: r.descripcion,
-        iconUrl: '/assets/icon/alerta.png'
-      });
+        return 'assets/iconos/logoOtro.png';
     }
   }
 

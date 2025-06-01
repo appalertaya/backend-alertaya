@@ -10,16 +10,25 @@
 <!-- categorias -->
 <ion-item>
   <ion-label>Categorías</ion-label>
-  <ion-select
-    [(ngModel)]="categoriasSeleccionadas"
-    multiple
-    interface="popover"
-    placeholder="Todas"
-    (ionChange)="cargarReportes()"
-  >
+  <ion-select [(ngModel)]="categoriasSeleccionadas" multiple interface="popover" placeholder="Todas"
+    (ionChange)="cargarReportes()">
     <ion-select-option *ngFor="let cat of todasCategorias" [value]="cat">{{ cat }}</ion-select-option>
   </ion-select>
 </ion-item>
+
+<!-- kilometros -->
+<ion-item>
+  <ion-label position="floating">Distancia (km)</ion-label>
+  <ion-input type="number" [(ngModel)]="radioKmSeleccionado" (ionInput)="cargarReportes()"
+    placeholder="Ej: 2"></ion-input>
+</ion-item>
+
+<!-- reiniciar filtros -->
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button (click)="reiniciarFiltros()" color="light">
+    <ion-icon name="refresh-outline"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
 
 
 <ion-content fullscreen>
@@ -31,6 +40,4 @@
     <div id="map"></div>
   </ion-content>
 
-  <!-- mapa -->
-  <capacitor-google-map id="map"></capacitor-google-map>
 </ion-content>

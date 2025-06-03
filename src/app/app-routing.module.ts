@@ -14,16 +14,21 @@ const routes: Routes = [
   },
   {
     path: 'reporte',
-    loadChildren: () => import('./pages/reporte/reporte.module').then( m => m.ReportePageModule)
+    loadChildren: () => import('./pages/reporte/reporte.module').then(m => m.ReportePageModule)
   },
   {
     path: 'historial',
-    loadChildren: () => import('./pages/historial/historial.module').then( m => m.HistorialPageModule)
+    loadChildren: () => import('./pages/historial/historial.module').then(m => m.HistorialPageModule)
   },
   {
     path: 'mapa',
-    loadChildren: () => import('./pages/mapa/mapa.module').then( m => m.MapaPageModule)
+    loadChildren: () => import('./pages/mapa/mapa.module').then(m => m.MapaPageModule)
+  },
+  {
+    path: 'register',
+    loadChildren: () => import('./pages/register/register.module').then(m => m.RegisterPageModule)
   }
+
 ];
 
 

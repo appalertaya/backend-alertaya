@@ -10,7 +10,7 @@ const getReportes = (req, res) => {
   radio = parseFloat(radio);
 
   const query = 'SELECT * FROM reportes';
-  
+
 
   db.getConnection((err, connection) => {
     if (err) {
@@ -73,15 +73,20 @@ const crearReporte = (req, res) => {
   const { descripcion, lat, lng, ciudad, fechaHora, enviado, categoria, imagenUrl } = req.body;
   console.log('Datos recibidos en POST:', req.body);
 
+  const usuarioId = req.user?.id;
+
+  if (!usuarioId) {
+    return res.status(401).json({ error: 'Usuario no autenticado' });
+  }
+
   if (!descripcion || !lat || !lng || !ciudad || !fechaHora || !categoria) {
     return res.status(400).json({ error: 'Faltan campos obligatorios' });
   }
 
   const sql = `
-    INSERT INTO reportes (descripcion, lat, lng, ciudad, fechaHora, enviado, categoria, imagenUrl)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO reportes (descripcion, lat, lng, ciudad, fechaHora, enviado, categoria, imagenUrl, usuarioId)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
-
 
   const valores = [
     descripcion,
@@ -91,7 +96,8 @@ const crearReporte = (req, res) => {
     fechaHora,
     enviado ?? true,
     categoria,
-    imagenUrl ?? ''  // Valor por defecto si no viene desde el frontend
+    imagenUrl ?? '',
+    usuarioId
   ];
 
   db.query(sql, valores, (err, results) => {
@@ -102,8 +108,6 @@ const crearReporte = (req, res) => {
     res.status(201).json({ mensaje: 'Reporte guardado', id: results.insertId });
   });
 };
-
-
 
 module.exports = {
   getReportes,

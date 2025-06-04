@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getReportes, crearReporte } = require('../controllers/reportes.controller');
+const { getReportes, crearReporte, getMisReportes } = require('../controllers/reportes.controller');
 const db = require('../config/db');
 const verifyToken = require('../middlewares/auth.middleware');
 
@@ -8,5 +8,7 @@ const verifyToken = require('../middlewares/auth.middleware');
 router.get('/', getReportes);
 // Aplica el middleware verifyToken y llama a crearReporte
 router.post('/', verifyToken, crearReporte);
+// para obtener reportes por usuario usando el token 
+router.get('/mios', verifyToken, getMisReportes);
 
 module.exports = router;

@@ -1,5 +1,7 @@
 const db = require('../config/db');
 
+const jwt = require('jsonwebtoken'); // para token, historial de reportes por usuario 
+
 // Obtener reportes
 const getReportes = (req, res) => {
   let { lat, lng, radio, categoria, ciudad } = req.query;
@@ -109,7 +111,35 @@ const crearReporte = (req, res) => {
   });
 };
 
+const getMisReportes = (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token no proporcionado' });
+  }
+
+  let usuarioId;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    usuarioId = decoded.id;
+  } catch (err) {
+    return res.status(401).json({ error: 'Token inválido' });
+  }
+
+  const sql = 'SELECT * FROM reportes WHERE usuarioId = ? ORDER BY fechaHora DESC';
+
+  db.query(sql, [usuarioId], (err, results) => {
+    if (err) {
+      console.error('Error al obtener reportes del usuario:', err);
+      return res.status(500).json({ error: 'Error al obtener tus reportes' });
+    }
+
+    res.json(results);
+  });
+};
+
 module.exports = {
   getReportes,
   crearReporte,
+  getMisReportes
 };

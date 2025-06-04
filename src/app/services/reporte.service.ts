@@ -32,11 +32,11 @@ export class ReporteService {
 
     try {
       const { value: token } = await Preferences.get({ key: 'token' });
-      console.log('TOKEN ACTUAL:', value);
+      // console.log('TOKEN ACTUAL:', value);
       const headers = new HttpHeaders({
         Authorization: `Bearer ${token}`
       });
-      console.log('Authorization Header:', headers.get('Authorization'));
+      // console.log('Authorization Header:', headers.get('Authorization'));
 
       await this.http.post(this.apiUrl, reporte, { headers }).toPromise();
       console.log('Reporte enviado al backend correctamente');
@@ -107,7 +107,7 @@ export class ReporteService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`
     });
-    console.log('Authorization Header:', headers.get('Authorization'));
+    // console.log('Authorization Header:', headers.get('Authorization'));
 
     console.log(`Intentando sincronizar ${pendientes.length} reporte(s) pendiente(s)...`);
 

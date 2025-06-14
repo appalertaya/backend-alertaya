@@ -12,12 +12,14 @@ export class AuthService {
   constructor(private http: HttpClient) { }
 
   login(email: string, password: string) {
-    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, { email, password });
+    return this.http.post<{
+      email(email: any): unknown; token: string 
+}>(`${this.apiUrl}/login`, { email, password });
   }
 
   async guardarToken(token: string) {
     await Preferences.set({ key: 'token', value: token });
-  }
+  } 
 
   async obtenerToken(): Promise<string | null> {
     const { value } = await Preferences.get({ key: 'token' });

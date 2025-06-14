@@ -6,6 +6,7 @@ import { ToastController } from '@ionic/angular';
 import { ConfigService } from './config.service';
 
 export interface Reporte {
+  id?: number;
   descripcion: string;
   lat: number;
   lng: number;
@@ -13,6 +14,8 @@ export interface Reporte {
   fechaHora: string;
   enviado: boolean;
   categoria: string;
+  imagenUrl?: string;
+  creadorEmail?: string;
 }
 
 @Injectable({
@@ -27,8 +30,11 @@ export class ReporteService {
   constructor(private http: HttpClient, private toastController: ToastController, private configService: ConfigService) { }
 
   async guardarReporte(reporte: Reporte): Promise<void> {
+    console.log("reporte: ",reporte)
     const { value } = await Preferences.get({ key: this.STORAGE_KEY });
     const reportesLocales: Reporte[] = value ? JSON.parse(value) : [];
+
+    const { value: userEmail } = await Preferences.get({ key: 'email' }); // obtener email actual
 
     try {
       const { value: token } = await Preferences.get({ key: 'token' });
@@ -40,7 +46,7 @@ export class ReporteService {
 
       await this.http.post(this.apiUrl, reporte, { headers }).toPromise();
       console.log('Reporte enviado al backend correctamente');
-      reportesLocales.push({ ...reporte, enviado: true });
+      reportesLocales.push({ ...reporte, enviado: true, creadorEmail: userEmail ?? undefined });
     } catch (error: any) {
       console.warn('No se pudo enviar el reporte al backend. Guardando localmente.', error);
       if (error.status === 0) {
@@ -48,7 +54,7 @@ export class ReporteService {
       } else {
         console.warn('Error al insertar reporte:', error);
       }
-      reportesLocales.push({ ...reporte, enviado: false });
+      reportesLocales.push({ ...reporte, enviado: false, creadorEmail: userEmail ?? undefined });
     }
 
     await Preferences.set({
@@ -83,51 +89,89 @@ export class ReporteService {
     await Preferences.remove({ key: this.STORAGE_KEY });
   }
 
-  async eliminarReportePorFecha(fechaHora: string): Promise<void> {
+  async eliminarReporteBackend(id: number): Promise<void> {
     const { value } = await Preferences.get({ key: this.STORAGE_KEY });
-    let reportes: Reporte[] = value ? JSON.parse(value) : [];
-
-    reportes = reportes.filter(r => r.fechaHora !== fechaHora);
-
-    await Preferences.set({
-      key: this.STORAGE_KEY,
-      value: JSON.stringify(reportes)
-    });
+    try {
+      const { value: token } = await Preferences.get({ key: 'token' });
+      // console.log('TOKEN ACTUAL:', value);
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${token}`
+      });
+      await this.http.delete(`${this.apiUrl}/${id}`, { headers }).toPromise();
+      console.log('Reporte id:',id,' eliminado correctamente');
+    } catch (error: any) {
+      console.warn('No se pudo eliminar el reporte del backend.', error);
+    }
   }
 
+
   // Sincronizar reportes pendientes
-  async sincronizarReportesPendientes(): Promise<void> {
-    const { value } = await Preferences.get({ key: this.STORAGE_KEY });
-    let reportes: Reporte[] = value ? JSON.parse(value) : [];
+  async sincronizarReportesPendientes(): Promise<boolean> {
+    try {
+      const { value } = await Preferences.get({ key: this.STORAGE_KEY });
+      let reportes: Reporte[] = value ? JSON.parse(value) : [];
 
-    const pendientes = reportes.filter(r => !r.enviado);
-    if (pendientes.length === 0) return;
+      console.log("reportes a sincronizar: ",reportes)
 
+      // Obtener correo del usuario actual
+      const { value: userEmail } = await Preferences.get({ key: 'email' });
+      const correoActual = userEmail ?? undefined;
+
+      if (!correoActual) {
+        console.warn('No hay usuario autenticado, no se sincronizan reportes');
+        return false;
+      }
+
+      // Filtrar solo reportes pendientes del usuario actual
+      const pendientes = reportes.filter(r => !r.enviado && r.creadorEmail === correoActual);
+      if (pendientes.length === 0) return false;
+
+      const { value: token } = await Preferences.get({ key: 'token' });
+      const headers = new HttpHeaders({
+        Authorization: `Bearer ${token}`
+      });
+      // console.log('Authorization Header:', headers.get('Authorization'));
+
+      console.log(`Intentando sincronizar ${pendientes.length} reporte(s) pendiente(s) del usuario ${correoActual}...`);
+
+      for (const r of pendientes) {
+        try {
+          await this.http.post(this.apiUrl, r, { headers }).toPromise();
+          r.enviado = true;
+          console.log('Reporte sincronizado:', r.fechaHora);
+        } catch (err) {
+          console.warn('No se pudo sincronizar reporte:', r.fechaHora, ' Error: ', err);
+        }
+      }
+
+      // Guardar nuevamente los datos actualizados
+      await Preferences.set({
+        key: this.STORAGE_KEY,
+        value: JSON.stringify(reportes)
+      });
+      return true;
+    } catch (error) {
+      console.warn('Ocurrió un error al sincronizar los reportes: ', error)
+      return false;
+    }
+  }
+
+  // get reportes por usuario 
+  async getMisReportes(): Promise<Reporte[]> {
     const { value: token } = await Preferences.get({ key: 'token' });
+
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`
     });
-    // console.log('Authorization Header:', headers.get('Authorization'));
 
-    console.log(`Intentando sincronizar ${pendientes.length} reporte(s) pendiente(s)...`);
-
-    for (const r of pendientes) {
-      try {
-        await this.http.post(this.apiUrl, r, { headers }).toPromise();
-        r.enviado = true;
-        console.log('Reporte sincronizado:', r.fechaHora);
-      } catch (err) {
-        console.warn('No se pudo sincronizar reporte:', r.fechaHora, ' Error: ', err);
-      }
+    try {
+      const reportes = await this.http.get<Reporte[]>(`${this.apiUrl}/mios`, { headers }).toPromise();
+      return reportes || [];
+    } catch (error) {
+      console.error('Error al obtener reportes del usuario:', error);
+      return [];
     }
-
-    // Guardar nuevamente los datos actualizados
-    await Preferences.set({
-      key: this.STORAGE_KEY,
-      value: JSON.stringify(reportes)
-    });
   }
-
 
   async mostrarMensaje(mensaje: string, color: string) {
     const toast = await this.toastController.create({

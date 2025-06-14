@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { Preferences } from '@capacitor/preferences';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -21,10 +22,13 @@ export class LoginPage {
     this.error = '';
   }
 
-  onLogin() {
+  async onLogin() {
     this.authService.login(this.email, this.password).subscribe({
       next: async (res) => {
-        await this.authService.guardarToken(res.token);
+        await Promise.all([
+          this.authService.guardarToken(res.token),
+          Preferences.set({ key: 'email', value: this.email })
+        ]);
         this.error = '';
         this.router.navigate(['/reporte']);
       },
@@ -33,6 +37,9 @@ export class LoginPage {
         console.warn('Login fallido:', err);
       }
     });
+    const { value } = await Preferences.get({ key: 'email' });
+    console.log('📩 Email almacenado:', value);
+
   }
 
   irARegistro() {

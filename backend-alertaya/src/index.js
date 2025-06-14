@@ -13,11 +13,16 @@ app.use(cors({
 app.use(express.json());
 
 // Rutas principales
+// reportes 
 const reportesRouter = require('./routes/reportes');
 app.use('/api/reportes', reportesRouter);
 
+// auth 
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
+
+// valoraciones 
+app.use('/api/valoraciones', require('./routes/valoraciones'));
 
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;

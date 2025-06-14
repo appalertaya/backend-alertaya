@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle del reporte</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="reporte">
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ reporte.ciudad }}</ion-card-title>
+      <ion-card-subtitle>{{ reporte.fechaHora }}</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p><strong>Categoría:</strong> {{ reporte.categoria }}</p>
+      <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
+      <p><strong>Ubicación:</strong> Lat {{ reporte.lat }}, Lng {{ reporte.lng }}</p>
+
+      <!-- Imágenes (si las agregas más adelante) -->
+      <!-- <img *ngIf="reporte.imagenUrl" [src]="reporte.imagenUrl" /> -->
+
+      <ion-button expand="block" color="success" (click)="valorar(true)">
+        👍 Útil
+      </ion-button>
+
+      <ion-button expand="block" color="medium" (click)="valorar(false)">
+        👎 No útil
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

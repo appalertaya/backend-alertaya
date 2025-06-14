@@ -1,3 +1,4 @@
+
 const db = require('../config/db');
 
 const jwt = require('jsonwebtoken'); // para token, historial de reportes por usuario 
@@ -112,6 +113,7 @@ const crearReporte = (req, res) => {
 };
 
 const getMisReportes = (req, res) => {
+  console.log(req.user)
   const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
@@ -138,8 +140,50 @@ const getMisReportes = (req, res) => {
   });
 };
 
+const getReportePorId = (req, res) => {
+  const { id } = req.params;
+  const sql = 'SELECT * FROM reportes WHERE id = ?';
+
+  db.query(sql, [id], (err, results) => {
+    if (err) {
+      console.error('Error al obtener reporte por ID:', err);
+      return res.status(500).json({ error: 'Error al obtener el reporte' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Reporte no encontrado' });
+    }
+
+    res.json(results[0]);
+  });
+};
+
+
+const eliminarReporte = (req, res) => {
+  const { id } = req.params;
+
+  const sql = 'DELETE FROM reportes WHERE id = ?';
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error('Error al eliminar reporte:', err);
+      return res.status(500).json({ error: 'Error al eliminar reporte' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Reporte no encontrado' });
+    }
+
+    res.status(200).json({ mensaje: 'Reporte eliminado correctamente' });
+  });
+};
+
+
 module.exports = {
   getReportes,
   crearReporte,
-  getMisReportes
+  getMisReportes,
+  getReportePorId,
+  eliminarReporte
 };
+

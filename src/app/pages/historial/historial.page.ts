@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ReporteService, Reporte } from 'src/app/services/reporte.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
+import { PermisosGPSInternetService } from 'src/app/services/permisos.service';
 
 @Component({
   selector: 'app-historial',
@@ -11,8 +12,14 @@ import { AlertController } from '@ionic/angular';
 export class HistorialPage implements OnInit {
 
   reportes: Reporte[] = [];
-  mostrarLocales: boolean = true; // Cambiar entre local y backend
   filtroCategoria: string = '';
+  error: string = '';
+  conexionLista: boolean = false;
+  cargando: boolean = true;
+
+  pendientesLocales: Reporte[] = [];
+  apiFallo: boolean = false;
+
 
   categorias: string[] = [
     'Corte de luz',
@@ -27,28 +34,50 @@ export class HistorialPage implements OnInit {
 
   constructor(
     private reporteService: ReporteService,
-    private alertController: AlertController
-  ) {}
+    private alertController: AlertController,
+    private toastController: ToastController,
+    private permisosService: PermisosGPSInternetService
+  ) { }
 
   async ngOnInit() {
+    this.error = '';
+    this.cargando = true;
+    this.conexionLista = false;
     await this.cargarReportes();
   }
 
-  // Cargar según origen
+  // Cargar reportes 
   async cargarReportes() {
-    if (this.mostrarLocales) {
-      this.reportes = (await this.reporteService.getReportesLocales()).reverse();
-    } else {
-      this.reporteService.getReportesDesdeBackend({}).subscribe(data => {
-        this.reportes = [...data].reverse();
-      });
+    try {
+      const conexionOk = await this.permisosService.verificarConexionInternet('Se requiere conexión a internet');
+
+      if (!conexionOk) {
+        this.error = 'Debes activar el GPS y tener conexión a internet para continuar.';
+        return;
+      }
+
+      this.conexionLista = true;
+      this.apiFallo = false;
+      this.pendientesLocales = [];
+
+      const reportesApi = await this.reporteService.getMisReportes();
+      this.reportes = reportesApi.sort((a, b) => new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime());
+    } catch (err) {
+      console.warn('Fallo al cargar historial desde API:', err);
+      this.apiFallo = true;
+      this.error = 'No se pudo cargar tu historial. Verifica tu conexión.';
+      this.mostrarMensaje('No se pudo cargar tu historial. Verifica tu conexión.', 'warning');
+
+      // Cargar reportes pendientes locales si hay
+      const locales = await this.reporteService.getReportesLocales();
+      this.pendientesLocales = locales.filter(r => !r.enviado);
+    } finally {
+      this.cargando = false;
     }
   }
 
-  // Cambiar origen (local o backend)
-  async toggleOrigen() {
-    this.mostrarLocales = !this.mostrarLocales;
-    await this.cargarReportes();
+  reintentarVerificacion() {
+    this.ngOnInit(); // Reinicia todo el flujo
   }
 
   // Filtro por categoría
@@ -57,7 +86,7 @@ export class HistorialPage implements OnInit {
     return this.reportes.filter(r => r.categoria === this.filtroCategoria);
   }
 
-  // Solo aplica a reportes locales
+  // Eliminar reportes del backend 
   async eliminarReporte(reporte: Reporte) {
     const alert = await this.alertController.create({
       header: 'Eliminar reporte',
@@ -67,13 +96,24 @@ export class HistorialPage implements OnInit {
         {
           text: 'Eliminar',
           handler: async () => {
-            await this.reporteService.eliminarReportePorFecha(reporte.fechaHora);
-            this.reportes = await this.reporteService.getReportesLocales();
-            this.reportes.reverse();
+            try {
+              await this.reporteService.eliminarReporteBackend(reporte.id!);
+              this.cargarReportes();
+            } catch (err) {
+              console.warn('Error al eliminar reporte del backend:', err);
+            }
           }
         }
       ]
     });
     await alert.present();
+  }
+  async mostrarMensaje(mensaje: string, color: string) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      color: color,
+      duration: 3000
+    });
+    toast.present();
   }
 }

@@ -41,6 +41,14 @@ export class ReportePage {
         return;
       }
 
+      // para sincronizar reportes pendientes 
+      const sincronizar = this.reporteService.sincronizarReportesPendientes();
+      if (await sincronizar) {
+        this.mostrarMensaje('Reportes pendientes sincronizados con éxito.', 'success')
+      }else{
+        console.log("No se pudieron sincronizar los reportes pendientes.")
+      }
+
       const ubicacion = await this.geoService.getCurrentPosition();
       if (ubicacion) {
         this.ubicacion = {
@@ -61,7 +69,7 @@ export class ReportePage {
     }
   }
 
-  // 🔍 Generador de URL segura para iframe
+  // Generador de URL segura para iframe
   get mapaPreviewUrl(): string {
     if (!this.ubicacion) return '';
     return `https://www.google.com/maps?q=${this.ubicacion.lat},${this.ubicacion.lng}&z=16&output=embed`;
@@ -75,12 +83,11 @@ export class ReportePage {
     this.error = '';
 
     const gpsOk = await this.permisosService.verificarGPSyPermisos();
-    const conexionOk = await this.permisosService.verificarConexionInternet('Se requiere conexión a internet');
 
-    if (!gpsOk || !conexionOk) {
-      this.mostrarMensaje('Algo falló, revise su conexión a internet y GPS', 'danger')
-      return
-    };
+    if (!gpsOk) {
+      this.mostrarMensaje('Debes activar el GPS para enviar un reporte.', 'danger');
+      return;
+    }
 
     const ubicacionActual = await this.geoService.getCurrentPosition();
     if (!ubicacionActual) {
@@ -89,7 +96,7 @@ export class ReportePage {
     }
 
     const ciudad = await this.geoService.obtenerCiudad(ubicacionActual.lat, ubicacionActual.lon);
-    const fechaHora = new Date().toISOString().split('.')[0]; // sin milisegundos '2025-05-23T01:01:08'
+    const fechaHora = new Date().toISOString().split('.')[0]; // sin milisegundos 'YYYY-MM-DDTHH:mm:ss' '2025-05-23T01:01:08'
 
     const nuevoReporte: Reporte = {
       descripcion: this.descripcion,

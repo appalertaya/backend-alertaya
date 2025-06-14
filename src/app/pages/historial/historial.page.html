@@ -8,49 +8,97 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-item>
-    <ion-label>Filtrar por categoría</ion-label>
-    <ion-select [(ngModel)]="filtroCategoria" interface="popover" placeholder="Todas">
-      <ion-select-option value="">Todas</ion-select-option>
-      <ion-select-option *ngFor="let cat of categorias" [value]="cat">
-        {{ cat }}
-      </ion-select-option>
-    </ion-select>
-  </ion-item>
 
-  <ion-card *ngFor="let reporte of reportesFiltrados; let i = index">
-    <ion-chip color="primary" *ngIf="reporte.categoria">
-      <ion-icon name="pricetag-outline" slot="start"></ion-icon>
-      {{ reporte.categoria }}
-    </ion-chip>
+  <ion-spinner name="crescent" *ngIf="cargando && !error" style="display: block; margin: 2rem auto;"></ion-spinner>
 
+  <ion-card *ngIf="!conexionLista && !cargando">
     <ion-card-header>
-      <ion-card-title>{{ reporte.ciudad }}</ion-card-title>
-      <ion-card-subtitle>{{ reporte.fechaHora }}</ion-card-subtitle>
+      <ion-card-title>Conexión a internet requerida</ion-card-title>
     </ion-card-header>
 
     <ion-card-content>
-      <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
-      <p><strong>Lat:</strong> {{ reporte.lat }} <strong>Lng:</strong> {{ reporte.lng }}</p>
-
-      <ion-button color="danger" fill="clear" size="small" (click)="eliminarReporte(reporte)">
-        <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-
-      <ion-chip color="success" *ngIf="reporte.enviado">
-        <ion-icon name="checkmark-circle-outline" color="light" slot="start"></ion-icon>
-        Enviado
-      </ion-chip>
-
-      <ion-chip color="warning" *ngIf="!reporte.enviado">
-        <ion-icon name="time-outline" color="light" slot="start"></ion-icon>
-        Pendiente
-      </ion-chip>
+      {{ error }}
+      <ion-button expand="block" (click)="reintentarVerificacion()">Reintentar</ion-button>
     </ion-card-content>
   </ion-card>
 
-
-  <ion-text color="medium" *ngIf="reportes.length === 0">
-    <p>No hay reportes guardados aún.</p>
+  <ion-text color="danger" *ngIf="conexionLista && !cargando && error">
+    <p class="ion-text-center">{{ error }}</p>
   </ion-text>
+
+  <!-- Reportes desde la API -->
+  <ion-content *ngIf="conexionLista && !cargando && !apiFallo">
+
+    <ion-item>
+      <ion-label>Filtrar por categoría</ion-label>
+      <ion-select [(ngModel)]="filtroCategoria" interface="popover" placeholder="Todas">
+        <ion-select-option value="">Todas</ion-select-option>
+        <ion-select-option *ngFor="let cat of categorias" [value]="cat">
+          {{ cat }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-card *ngFor="let reporte of reportesFiltrados; let i = index">
+      <ion-chip color="primary" *ngIf="reporte.categoria">
+        <ion-icon name="pricetag-outline" slot="start"></ion-icon>
+        {{ reporte.categoria }}
+      </ion-chip>
+
+      <ion-card-header>
+        <ion-card-title>{{ reporte.ciudad }}</ion-card-title>
+        <ion-card-subtitle>{{ reporte.fechaHora }}</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
+        <p><strong>Lat:</strong> {{ reporte.lat }} <strong>Lng:</strong> {{ reporte.lng }}</p>
+
+        <ion-button color="danger" fill="clear" size="small" (click)="eliminarReporte(reporte)">
+          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+
+        <ion-chip color="success" *ngIf="reporte.enviado">
+          <ion-icon name="checkmark-circle-outline" color="light" slot="start"></ion-icon>
+          Enviado
+        </ion-chip>
+
+        <ion-chip color="warning" *ngIf="!reporte.enviado">
+          <ion-icon name="time-outline" color="light" slot="start"></ion-icon>
+          Pendiente
+        </ion-chip>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-text color="medium" *ngIf="reportes.length === 0">
+      <p>No hay reportes guardados aún.</p>
+    </ion-text>
+  </ion-content>
+
+  <!-- Reportes pendientes si la API falla -->
+  <ng-container *ngIf="apiFallo && pendientesLocales.length > 0">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title color="warning">Reportes pendientes de envío</ion-card-title>
+      </ion-card-header>
+    </ion-card>
+
+    <ion-card *ngFor="let reporte of pendientesLocales">
+      <ion-chip color="warning">
+        <ion-icon name="time-outline" slot="start"></ion-icon>
+        Pendiente
+      </ion-chip>
+
+      <ion-card-header>
+        <ion-card-title>{{ reporte.ciudad }}</ion-card-title>
+        <ion-card-subtitle>{{ reporte.fechaHora }}</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
+        <p><strong>Lat:</strong> {{ reporte.lat }} <strong>Lng:</strong> {{ reporte.lng }}</p>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+
 </ion-content>

@@ -1,36 +1,44 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
+      <ion-back-button defaultHref="/mapa"></ion-back-button>
     </ion-buttons>
-    <ion-title>Detalle del reporte</ion-title>
+    <ion-title>Detalle del Reporte</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content *ngIf="reporte">
+<ion-content class="ion-padding">
 
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>{{ reporte.ciudad }}</ion-card-title>
-      <ion-card-subtitle>{{ reporte.fechaHora }}</ion-card-subtitle>
-    </ion-card-header>
+  <ion-spinner *ngIf="cargando" name="crescent" style="display:block; margin:2rem auto;"></ion-spinner>
 
-    <ion-card-content>
-      <p><strong>Categoría:</strong> {{ reporte.categoria }}</p>
-      <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
-      <p><strong>Ubicación:</strong> Lat {{ reporte.lat }}, Lng {{ reporte.lng }}</p>
+  <ng-container *ngIf="!cargando && reporte">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ reporte.categoria }}</ion-card-title>
+        <ion-card-subtitle>{{ reporte.fechaHora }} - {{ reporte.ciudad }}</ion-card-subtitle>
+      </ion-card-header>
 
-      <!-- Imágenes (si las agregas más adelante) -->
-      <!-- <img *ngIf="reporte.imagenUrl" [src]="reporte.imagenUrl" /> -->
+      <ion-card-content>
+        <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
+        <p><strong>Ubicación:</strong> Lat {{ reporte.lat }} / Lng {{ reporte.lng }}</p>
 
-      <ion-button expand="block" color="success" (click)="valorar(true)">
-        👍 Útil
-      </ion-button>
+        <ion-item lines="none">
+          <ion-label class="ion-text-wrap">¿Te fue útil este reporte?</ion-label>
+        </ion-item>
 
-      <ion-button expand="block" color="medium" (click)="valorar(false)">
-        👎 No útil
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+        <ion-button expand="block" color="success" fill="{{ valoracionActual === true ? 'solid' : 'outline' }}"
+          (click)="valorar(true)">
+          👍 Sí, fue útil
+        </ion-button>
+
+        <ion-button expand="block" color="danger" fill="{{ valoracionActual === false ? 'solid' : 'outline' }}"
+          (click)="valorar(false)">
+          👎 No fue útil
+        </ion-button>
+
+
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
 
 </ion-content>

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getReportes, crearReporte, getMisReportes, eliminarReporte } = require('../controllers/reportes.controller');
+const { getReportes, crearReporte, getMisReportes, eliminarReporte, getReportePorId } = require('../controllers/reportes.controller');
 const db = require('../config/db');
 const verifyToken = require('../middlewares/auth.middleware');
 
@@ -11,7 +11,7 @@ router.post('/', verifyToken, crearReporte);
 // para obtener reportes por usuario usando el token 
 router.get('/mios', verifyToken, getMisReportes);
 // obtener un solo reporte 
-router.get('/:id', getReportePorId); 
+router.get('/:id', getReportePorId);
 // eliminar reportes del backend 
 router.delete('/:id', verifyToken, eliminarReporte);
 

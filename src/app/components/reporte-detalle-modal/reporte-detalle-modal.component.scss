@@ -1,0 +1,22 @@
+.botones {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// // estilos modal 
+// .reporte-detalle-modal::part(content) {
+//   --background: #2c2c2c;
+//   --color: #ffffff;
+//   width: 92%;
+//   max-width: 500px;
+//   max-height: 90%;
+//   height: auto;
+//   margin: auto;
+//   top: 50%;
+//   transform: translateY(-50%);
+//   border-radius: 16px;
+//   padding: 16px;
+//   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+// }
+

@@ -14,33 +14,37 @@ export class ReporteDetallePage implements OnInit {
   reporte: Reporte | null = null;
   cargando: boolean = true;
   error: string = '';
+  valoracionActual: boolean | null = null; // true = útil, false = no útil, null = sin valorar
 
   constructor(
     private route: ActivatedRoute,
     private reporteService: ReporteService,
     private valoracionService: ValoracionService
-  ) {}
+  ) { }
 
   async ngOnInit() {
     try {
       const idParam = this.route.snapshot.paramMap.get('id');
-      if (!idParam) {
+      if (!idParam || isNaN(Number(idParam))) {
         this.error = 'ID de reporte no válido.';
         return;
       }
 
       const id = Number(idParam);
-      const reportes = await this.reporteService.getReportesDesdeBackend({}).toPromise();
+      const reporte = await this.reporteService.getReportePorId(id);
 
-      if (!reportes) {
-        this.error = 'No se pudo obtener los reportes.';
+      if (!reporte) {
+        this.error = 'Reporte no encontrado.';
         return;
       }
 
-      this.reporte = reportes.find(r => r.id === id) || null;
+      this.reporte = reporte;
 
-      if (!this.reporte) {
-        this.error = 'Reporte no encontrado.';
+      const resp = await (await this.valoracionService.obtenerValoracionUsuario(id)).toPromise();
+      if (resp && resp.valorado) {
+        this.valoracionActual = resp.util === true;
+      } else {
+        this.valoracionActual = null;
       }
 
     } catch (err) {
@@ -51,11 +55,20 @@ export class ReporteDetallePage implements OnInit {
     }
   }
 
+
   async valorar(util: boolean) {
     if (!this.reporte?.id) return;
-    (await this.valoracionService.valorarReporte(this.reporte.id, util)).subscribe({
-      next: () => console.log('Valoración enviada'),
-      error: (err) => console.error('Error al valorar', err)
-    });
+
+    const utilidad: 'util' | 'no_util' = util ? 'util' : 'no_util';
+
+    try {
+      (await this.valoracionService.valorarReporte(this.reporte.id, utilidad)).subscribe({
+        next: () => console.log('Valoración enviada'),
+        error: (err) => console.error('Error al valorar', err)
+      });
+    } catch (error) {
+      console.error('Error al ejecutar la valoración:', error);
+    }
   }
+
 }

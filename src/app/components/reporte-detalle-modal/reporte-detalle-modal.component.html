@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Detalle del Reporte</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="cerrarModal()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card *ngIf="reporte">
+    <ion-card-header>
+      <ion-card-subtitle>{{ reporte.fechaHora }} - {{ reporte.ciudad }}</ion-card-subtitle>
+      <ion-card-title>{{ reporte.categoria }}</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
+      <p><strong>Ubicación:</strong> Lat {{ reporte.lat }} / Lng {{ reporte.lng }}</p>
+
+      <ion-text color="medium">
+        <p class="ion-text-center">¿Te fue útil este reporte?</p>
+      </ion-text>
+
+      <ion-button [color]="valoracion === true ? 'success' : 'medium'" (click)="valorar(true)">
+        👍 Sí, fue útil
+      </ion-button>
+      <ion-button [color]="valoracion === false ? 'danger' : 'medium'" (click)="valorar(false)">
+        👎 No fue útil
+      </ion-button>
+
+    </ion-card-content>
+  </ion-card>
+
+  <ion-spinner *ngIf="!reporte" name="crescent" style="display:block;margin: 2rem auto;"></ion-spinner>
+</ion-content>

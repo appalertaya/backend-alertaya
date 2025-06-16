@@ -2,27 +2,47 @@ const db = require('../config/db');
 
 // Crear o actualizar una valoración
 const valorarReporte = (req, res) => {
-  const { reporteId, valor } = req.body;
-  const usuarioId = req.user.id; // obtenido del middleware
+  const usuarioEmail = req.user?.email;
+  const reporteId = req.params.id;
+  const { utilidad } = req.body; // tiene que venir como 'util' o 'no_util'
 
-  if (![1, -1].includes(valor)) {
-    return res.status(400).json({ error: 'Valor no válido.' });
+  if (!usuarioEmail || !reporteId || !['util', 'no_util'].includes(utilidad)) {
+    return res.status(400).json({ error: 'Datos inválidos' });
   }
 
   const sql = `
-    INSERT INTO valoraciones (usuario_id, reporte_id, valor)
+    INSERT INTO valoraciones (reporte_id, usuario_email, utilidad)
     VALUES (?, ?, ?)
-    ON DUPLICATE KEY UPDATE valor = VALUES(valor)
+    ON DUPLICATE KEY UPDATE utilidad = VALUES(utilidad)
   `;
 
-  db.query(sql, [usuarioId, reporteId, valor], (err, result) => {
-    if (err) {
-      console.error('Error al valorar reporte:', err);
-      return res.status(500).json({ error: 'Error al valorar reporte' });
-    }
+  db.query(sql, [reporteId, usuarioEmail, utilidad], (err) => {
+    if (err) return res.status(500).json({ error: 'Error al registrar valoración' });
     res.status(200).json({ mensaje: 'Valoración registrada' });
   });
 };
+
+
+// obtener valoracion de usuario 
+const obtenerValoracionUsuario = (req, res) => {
+  const userEmail = req.user?.email;  // Email en lugar de id
+  const reporteId = req.params.reporteId;
+
+  if (!userEmail || !reporteId) {
+    return res.status(400).json({ error: 'Datos inválidos' });
+  }
+
+  db.query(
+    'SELECT * FROM valoraciones WHERE reporte_id = ? AND usuario_email = ?',
+    [reporteId, userEmail],
+    (err, resultados) => {
+      if (err) return res.status(500).json({ error: 'Error al obtener valoración' });
+      if (resultados.length === 0) return res.json({ valorado: false });
+      res.json({ valorado: true, util: resultados[0].utilidad }); // cuidado: es 'utilidad'
+    }
+  );
+};
+
 
 // Obtener resumen de valoraciones para un reporte
 const obtenerResumenValoraciones = (req, res) => {
@@ -45,4 +65,4 @@ const obtenerResumenValoraciones = (req, res) => {
   });
 };
 
-module.exports = { valorarReporte, obtenerResumenValoraciones };
+module.exports = { valorarReporte, obtenerResumenValoraciones, obtenerValoracionUsuario };

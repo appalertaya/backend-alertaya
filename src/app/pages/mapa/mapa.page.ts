@@ -3,6 +3,9 @@ import { GoogleMap } from '@capacitor/google-maps';
 import { GeolocationService } from 'src/app/services/geolocalizacion.service';
 import { PermisosGPSInternetService } from 'src/app/services/permisos.service';
 import { ReporteService } from 'src/app/services/reporte.service';
+import { Router } from '@angular/router';
+import { ModalController } from '@ionic/angular';
+import { ReporteDetalleModalComponent } from 'src/app/components/reporte-detalle-modal/reporte-detalle-modal.component';
 
 interface Reporte {
   lat: number;
@@ -40,7 +43,8 @@ export class MapaPage implements AfterViewInit {
   constructor(
     private geoService: GeolocationService,
     private permisosService: PermisosGPSInternetService,
-    private reporteService: ReporteService
+    private reporteService: ReporteService,
+    private modalController: ModalController
   ) { }
 
   async ngAfterViewInit() {
@@ -156,15 +160,25 @@ export class MapaPage implements AfterViewInit {
     return R * c;
   }
 
-  async mostrarMarcadores(reportes: any[]) {
+  private marcadorReporteMap = new Map<string, number>(); // marcadorId -> reporteId
 
+  async abrirModalDetalle(reporte: Reporte) {
+    const modal = await this.modalController.create({
+      component: ReporteDetalleModalComponent,
+      componentProps: { reporte }
+    });
+    await modal.present();
+  }
+
+  async mostrarMarcadores(reportes: any[]) {
     // Eliminar marcadores anteriores
     for (const id of this.marcadores) {
       await this.newMap?.removeMarker(id);
     }
     this.marcadores = [];
+    this.marcadorReporteMap.clear();
 
-    // Agregar marcador de tu ubicación primero
+    // Agregar marcador de tu ubicación
     const ubicacion = await this.geoService.getCurrentPosition();
     if (ubicacion) {
       const marcadorId = await this.newMap?.addMarker({
@@ -173,35 +187,48 @@ export class MapaPage implements AfterViewInit {
         iconUrl: 'assets/iconos/logoYo.png',
         iconSize: { width: 36, height: 36 }
       });
-
-      if (marcadorId) {
-        this.marcadores.push(marcadorId);
-      }
+      if (marcadorId) this.marcadores.push(marcadorId);
     }
 
-    // Agregar nuevos marcadores de reportes
+    // Agregar marcadores de reportes
     for (const rep of reportes) {
       try {
-        const marcadorId = await this.newMap?.addMarker({
+        const markerId = await this.newMap?.addMarker({
           coordinate: {
             lat: parseFloat(rep.lat),
             lng: parseFloat(rep.lng),
           },
-          title: rep.categoria,
-          snippet: rep.descripcion,
           iconUrl: this.getIconoPorCategoria(rep.categoria),
           iconSize: { width: 32, height: 32 }
         });
 
-        if (marcadorId) {
-          this.marcadores.push(marcadorId);
+        if (markerId) {
+          this.marcadores.push(markerId);
+          this.marcadorReporteMap.set(markerId, rep); // Asocia el objeto completo
         }
-
       } catch (err) {
         console.warn('Error al agregar marcador:', err);
       }
     }
+
+    // Registrar listener para clics en marcadores
+    this.newMap?.setOnMarkerClickListener(async (data) => {
+      const reporte = this.marcadorReporteMap.get(data.markerId);
+      if (reporte) {
+        const modal = await this.modalController.create({
+          component: ReporteDetalleModalComponent,
+          componentProps: { reporte }, 
+          cssClass: 'reporte-detalle-modal',
+          backdropDismiss: true,
+          showBackdrop: true
+        });
+        await modal.present();
+      }
+    });
   }
+
+
+
 
   reiniciarFiltros() {
     this.categoriasSeleccionadas = [];

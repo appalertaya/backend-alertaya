@@ -22,6 +22,7 @@ export interface Reporte {
   providedIn: 'root'
 })
 export class ReporteService {
+
   private STORAGE_KEY = 'reportes';
 
   private apiUrl = `${environment.backendUrl}/api/reportes`;
@@ -30,7 +31,7 @@ export class ReporteService {
   constructor(private http: HttpClient, private toastController: ToastController, private configService: ConfigService) { }
 
   async guardarReporte(reporte: Reporte): Promise<void> {
-    console.log("reporte: ",reporte)
+    console.log("reporte: ", reporte)
     const { value } = await Preferences.get({ key: this.STORAGE_KEY });
     const reportesLocales: Reporte[] = value ? JSON.parse(value) : [];
 
@@ -62,6 +63,15 @@ export class ReporteService {
       value: JSON.stringify(reportesLocales)
     });
   }
+
+getReportePorId(id: number): Promise<Reporte | undefined> {
+  return this.http.get<Reporte>(`${this.apiUrl}/${id}`).toPromise()
+    .catch(err => {
+      console.warn('No se encontró el reporte con ID:', id, err);
+      return undefined;
+    });
+}
+
 
   getReportesDesdeBackend(params: {
     lat?: number;
@@ -98,7 +108,7 @@ export class ReporteService {
         Authorization: `Bearer ${token}`
       });
       await this.http.delete(`${this.apiUrl}/${id}`, { headers }).toPromise();
-      console.log('Reporte id:',id,' eliminado correctamente');
+      console.log('Reporte id:', id, ' eliminado correctamente');
     } catch (error: any) {
       console.warn('No se pudo eliminar el reporte del backend.', error);
     }
@@ -111,7 +121,7 @@ export class ReporteService {
       const { value } = await Preferences.get({ key: this.STORAGE_KEY });
       let reportes: Reporte[] = value ? JSON.parse(value) : [];
 
-      console.log("reportes a sincronizar: ",reportes)
+      console.log("reportes a sincronizar: ", reportes)
 
       // Obtener correo del usuario actual
       const { value: userEmail } = await Preferences.get({ key: 'email' });
@@ -172,6 +182,7 @@ export class ReporteService {
       return [];
     }
   }
+
 
   async mostrarMensaje(mensaje: string, color: string) {
     const toast = await this.toastController.create({

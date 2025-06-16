@@ -10,8 +10,10 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { GoogleMapsModule } from '@angular/google-maps';
 
+import { ReporteDetalleModalComponent } from './components/reporte-detalle-modal/reporte-detalle-modal.component';
+
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, ReporteDetalleModalComponent],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, HttpClientModule, GoogleMapsModule],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],

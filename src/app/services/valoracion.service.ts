@@ -9,18 +9,19 @@ import { Preferences } from '@capacitor/preferences';
 export class ValoracionService {
   private apiUrl = `${environment.backendUrl}/api/valoraciones`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  async valorarReporte(idReporte: number, util: boolean) {
-    const { value: token } = await Preferences.get({ key: 'token' });
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
-
-    return this.http.post(`${this.apiUrl}`, {
-      idReporte,
-      util
-    }, { headers });
+  async valorarReporte(id: number, utilidad: 'util' | 'no_util') {
+    const token = await Preferences.get({ key: 'token' });
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token.value}` });
+    return this.http.post(`${this.apiUrl}/${id}`, { utilidad }, { headers });
   }
+
+
+  async obtenerValoracionUsuario(id: number) {
+    const token = await Preferences.get({ key: 'token' });
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token.value}` });
+    return this.http.get<{ valorado: boolean, util?: boolean }>(`${this.apiUrl}/usuario/${id}`, { headers });
+  }
+
 }

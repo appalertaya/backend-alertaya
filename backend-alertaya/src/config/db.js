@@ -1,6 +1,8 @@
 require('dotenv').config();
 const mysql = require('mysql2');
 
+console.log('📦 DATABASE_URL:', process.env.DATABASE_URL);
+
 const pool = mysql.createPool(process.env.DATABASE_URL, {
   waitForConnections: true,
   connectionLimit: 10,

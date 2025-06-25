@@ -30,3 +30,8 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`🟢 Servidor corriendo en http://0.0.0.0:${PORT}`);
 });
 
+//ping 
+app.get('/ping', (req, res) => {
+  res.send({ status: 'ok', message: 'API activa' });
+});
+

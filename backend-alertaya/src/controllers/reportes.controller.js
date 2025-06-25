@@ -8,6 +8,7 @@ const getReportes = (req, res) => {
   let { lat, lng, radio, categoria, ciudad } = req.query;
   console.log('Parámetros recibidos:', req.query);
 
+  // Conversión segura
   lat = parseFloat(lat);
   lng = parseFloat(lng);
   radio = parseFloat(radio);
@@ -18,7 +19,7 @@ const getReportes = (req, res) => {
   db.getConnection((err, connection) => {
     if (err) {
       console.error('Error al obtener conexión del pool:', err.message);
-      return res.status(500).json({ error: 'Error de conexión a base de datos' });
+      return res.status(500).json({ error: 'Error de conexión a base de datos', detalle: err.message });
     }
 
     connection.query(query, (err, results) => {
@@ -26,7 +27,7 @@ const getReportes = (req, res) => {
 
       if (err) {
         console.error('Error al obtener reportes:', err);
-        return res.status(500).json({ error: 'Error al obtener reportes' });
+        return res.status(500).json({ error: 'Error al obtener reportes', detalle: err.message });
       }
 
       console.log(`Total reportes en BD: ${results.length}`);

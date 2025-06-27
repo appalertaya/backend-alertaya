@@ -1,6 +1,6 @@
 require('dotenv').config();
 const fs = require('fs');
-const db = require('./db');
+const db = require('./config/db');
 
 const sql = fs.readFileSync('./init.sql', 'utf8');
 

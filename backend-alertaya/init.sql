@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS usuarios (
   tokenVerificacion VARCHAR(255),
   fechaRegistro DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE IF NOT EXISTS reportes (
   id INT AUTO_INCREMENT PRIMARY KEY,
   descripcion TEXT NOT NULL,
@@ -21,7 +20,6 @@ CREATE TABLE IF NOT EXISTS reportes (
   usuarioId INT,
   FOREIGN KEY (usuarioId) REFERENCES usuarios(id) ON DELETE SET NULL
 );
-
 CREATE TABLE IF NOT EXISTS valoraciones (
   id INT AUTO_INCREMENT PRIMARY KEY,
   reporte_id INT NOT NULL,

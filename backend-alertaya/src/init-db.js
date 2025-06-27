@@ -1,15 +1,15 @@
-require('dotenv').config();
 const fs = require('fs');
-const db = require('./config/db');
-
+const db = require('./config/db'); // ← asegúrate que apunte bien
 const sql = fs.readFileSync('./init.sql', 'utf8');
 
-db.query(sql)
+console.log('📦 DATABASE_URL:', process.env.DATABASE_URL);
+
+db.promise().query(sql)
   .then(() => {
     console.log('✅ Script SQL ejecutado correctamente');
-    process.exit(0);
+    db.end();
   })
-  .catch((err) => {
+  .catch(err => {
     console.error('❌ Error ejecutando el script SQL:', err.message);
-    process.exit(1);
+    db.end();
   });

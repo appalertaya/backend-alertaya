@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node src/init-db.js && node src/index.js"
+    "start": "node src/index.js"
   },
   "keywords": [],
   "author": "",
@@ -21,3 +21,4 @@
     "prisma": "^6.8.2"
   }
 }
+

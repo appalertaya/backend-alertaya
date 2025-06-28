@@ -10,16 +10,19 @@ const valorarReporte = (req, res) => {
     return res.status(400).json({ error: 'Datos inválidos' });
   }
 
-  const sql = `
-    INSERT INTO valoraciones (reporte_id, usuario_email, utilidad)
-    VALUES (?, ?, ?)
-    ON DUPLICATE KEY UPDATE utilidad = VALUES(utilidad)
-  `;
+  const fecha = new Date();
 
-  db.query(sql, [reporteId, usuarioEmail, utilidad], (err) => {
+  const sql = `
+  INSERT INTO valoraciones (reporte_id, usuario_email, utilidad, fecha)
+  VALUES (?, ?, ?, ?)
+  ON DUPLICATE KEY UPDATE utilidad = VALUES(utilidad), fecha = VALUES(fecha)
+`;
+
+  db.query(sql, [reporteId, usuarioEmail, utilidad, fecha], (err) => {
     if (err) return res.status(500).json({ error: 'Error al registrar valoración' });
     res.status(200).json({ mensaje: 'Valoración registrada' });
   });
+
 };
 
 
@@ -50,8 +53,8 @@ const obtenerResumenValoraciones = (req, res) => {
 
   const sql = `
     SELECT
-      SUM(CASE WHEN valor = 1 THEN 1 ELSE 0 END) AS utiles,
-      SUM(CASE WHEN valor = -1 THEN 1 ELSE 0 END) AS no_utiles
+      SUM(CASE WHEN utilidad = 'util' THEN 1 ELSE 0 END) AS utiles,
+      SUM(CASE WHEN utilidad = 'no_util' THEN 1 ELSE 0 END) AS no_utiles
     FROM valoraciones
     WHERE reporte_id = ?
   `;

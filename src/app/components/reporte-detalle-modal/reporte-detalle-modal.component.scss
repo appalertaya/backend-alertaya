@@ -4,6 +4,21 @@
   gap: 10px;
 }
 
+.valoracion-botones button {
+  margin: 0 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #f0f0f0;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.valoracion-botones button.seleccionado {
+  background-color: #d1e7dd;
+  border-color: #0f5132;
+  font-weight: bold;
+}
+
 // // estilos modal 
 // .reporte-detalle-modal::part(content) {
 //   --background: #2c2c2c;

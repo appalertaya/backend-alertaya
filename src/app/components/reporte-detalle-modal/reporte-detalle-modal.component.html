@@ -24,12 +24,15 @@
         <p class="ion-text-center">¿Te fue útil este reporte?</p>
       </ion-text>
 
-      <ion-button [color]="valoracion === true ? 'success' : 'medium'" (click)="valorar(true)">
-        👍 Sí, fue útil
-      </ion-button>
-      <ion-button [color]="valoracion === false ? 'danger' : 'medium'" (click)="valorar(false)">
-        👎 No fue útil
-      </ion-button>
+      <div class="valoracion-botones">
+        <button [class.seleccionado]="valoracion === true" (click)="valorar(true)">
+          👍 Útil
+        </button>
+
+        <button [class.seleccionado]="valoracion === false" (click)="valorar(false)">
+          👎 No útil
+        </button>
+      </div>
 
     </ion-card-content>
   </ion-card>

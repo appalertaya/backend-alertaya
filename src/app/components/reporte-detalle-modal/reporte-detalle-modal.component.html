@@ -25,13 +25,8 @@
       </ion-text>
 
       <div class="valoracion-botones">
-        <button [class.seleccionado]="valoracion === true" (click)="valorar(true)">
-          👍 Útil
-        </button>
-
-        <button [class.seleccionado]="valoracion === false" (click)="valorar(false)">
-          👎 No útil
-        </button>
+        <button [class.active]="valoracion === true" (click)="valorar(true)">👍 Útil</button>
+        <button [class.active]="valoracion === false" (click)="valorar(false)">👎 No útil</button>
       </div>
 
     </ion-card-content>

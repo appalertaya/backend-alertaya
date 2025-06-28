@@ -19,6 +19,12 @@
   font-weight: bold;
 }
 
+button.active {
+  background-color: #4caf50;
+  color: white;
+}
+
+
 // // estilos modal 
 // .reporte-detalle-modal::part(content) {
 //   --background: #2c2c2c;

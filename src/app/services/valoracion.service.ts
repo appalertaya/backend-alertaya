@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from 'src/environments/environment.prod';
+import { environment } from 'src/environments/environment';
 import { Preferences } from '@capacitor/preferences';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,6 @@ export class ValoracionService {
     return this.http.post(`${this.apiUrl}/${id}`, { utilidad }, { headers });
   }
 
-
   async obtenerValoracionUsuario(id: number) {
     const token = await Preferences.get({ key: 'token' });
     const headers = new HttpHeaders({ Authorization: `Bearer ${token.value}` });
@@ -26,8 +26,11 @@ export class ValoracionService {
   }
 
   eliminarValoracion(reporteId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${reporteId}`);
+    return from(Preferences.get({ key: 'token' })).pipe(
+      switchMap(tokenResult => {
+        const headers = new HttpHeaders({ Authorization: `Bearer ${tokenResult.value}` });
+        return this.http.delete(`${this.apiUrl}/${reporteId}`, { headers });
+      })
+    );
   }
-
-
 }

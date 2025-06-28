@@ -9,7 +9,7 @@ import { switchMap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class ValoracionService {
-  private apiUrl = `${environment.backendUrl}/api/valoraciones`;
+  private apiUrl = `https://backend-alertaya.onrender.com/api/valoraciones`;
 
   constructor(private http: HttpClient) { }
 
@@ -25,12 +25,11 @@ export class ValoracionService {
     return this.http.get<{ valorado: boolean, util?: boolean }>(`${this.apiUrl}/usuario/${id}`, { headers });
   }
 
-  eliminarValoracion(reporteId: number): Observable<any> {
-    return from(Preferences.get({ key: 'token' })).pipe(
-      switchMap(tokenResult => {
-        const headers = new HttpHeaders({ Authorization: `Bearer ${tokenResult.value}` });
-        return this.http.delete(`${this.apiUrl}/${reporteId}`, { headers });
-      })
-    );
+  async eliminarValoracion(reporteId: number) {
+    console.log("reporteId: ",reporteId)
+    const token = await Preferences.get({ key: 'token' });
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token.value}` });
+    return this.http.delete(`${this.apiUrl}/${reporteId}`, { headers });
   }
+
 }

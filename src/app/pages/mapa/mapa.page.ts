@@ -60,6 +60,7 @@ export class MapaPage implements AfterViewInit {
       return;
     }
 
+
     // Espera a que el DOM esté listo
     setTimeout(async () => {
 

@@ -26,7 +26,7 @@ export class ValoracionService {
   }
 
   eliminarValoracion(reporteId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/valoraciones/${reporteId}`);
+    return this.http.delete(`${this.apiUrl}/${reporteId}`);
   }
 
 

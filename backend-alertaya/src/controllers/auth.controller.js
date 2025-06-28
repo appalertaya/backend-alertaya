@@ -44,8 +44,11 @@ const register = async (req, res) => {
             // Enviar correo de verificación
             const enlace = `${process.env.APP_BASE_URL}/api/auth/verify-email?token=${token}`;
 
+            console.log("correo",process.env.EMAIL_FROM)
+            console.log("clave: ",process.env.EMAIL_PASS)
+
             transporter.sendMail({
-                from: '"Alertaya" <tucorreo@gmail.com>',
+                from: `"Alertaya" <${process.env.EMAIL_FROM}>`,
                 to: email,
                 subject: 'Verifica tu cuenta en Alertaya',
                 html: `<p>Hola ${nombre},</p>

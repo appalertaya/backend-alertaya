@@ -68,4 +68,22 @@ const obtenerResumenValoraciones = (req, res) => {
   });
 };
 
-module.exports = { valorarReporte, obtenerResumenValoraciones, obtenerValoracionUsuario };
+// eliminar valoracion
+const eliminarValoracion = (req, res) => {
+  const userEmail = req.user?.email;
+  const reporteId = req.params.id;
+
+  if (!userEmail || !reporteId) {
+    return res.status(400).json({ error: 'Datos inválidos' });
+  }
+
+  const sql = 'DELETE FROM valoraciones WHERE reporte_id = ? AND usuario_email = ?';
+
+  db.query(sql, [reporteId, userEmail], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Error al eliminar valoración' });
+    res.status(200).json({ mensaje: 'Valoración eliminada' });
+  });
+};
+
+
+module.exports = { valorarReporte, obtenerResumenValoraciones, obtenerValoracionUsuario, eliminarValoracion };

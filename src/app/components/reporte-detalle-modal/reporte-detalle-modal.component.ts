@@ -17,12 +17,13 @@ export class ReporteDetalleModalComponent {
   constructor(private modalCtrl: ModalController, private valoracionService: ValoracionService) { }
 
   async ngOnInit() {
-    console.log('Reporte recibido en el modal:', this.reporte);
     if (this.reporte?.id) {
       try {
         const response = await (await this.valoracionService.obtenerValoracionUsuario(this.reporte.id)).toPromise();
-        if (response!.valorado) {
-          this.valoracion = response!.util ?? null;
+        if (response?.valorado) {
+          this.valoracion = response.util ?? null;
+        } else {
+          this.valoracion = null;
         }
       } catch (err) {
         console.warn('Error al obtener valoración previa:', err);
@@ -37,14 +38,19 @@ export class ReporteDetalleModalComponent {
   async valorar(util: boolean) {
     if (!this.reporte?.id) return;
 
+    const yaValorado = this.valoracion === util;
+
     try {
-      const utilidad: 'util' | 'no_util' = util ? 'util' : 'no_util';
-
-      const resp = await (await this.valoracionService
-        .valorarReporte(this.reporte.id, utilidad))
-        .toPromise();
-
-      this.valoracion = this.valoracion === util ? null : util; // desmarcar o alternar
+      if (yaValorado) {
+        // desmarcar (eliminar valoración)
+        await (await this.valoracionService.eliminarValoracion(this.reporte.id)).toPromise();
+        this.valoracion = null;
+      } else {
+        // nueva valoración o cambio
+        const utilidad: 'util' | 'no_util' = util ? 'util' : 'no_util';
+        await (await this.valoracionService.valorarReporte(this.reporte.id, utilidad)).toPromise();
+        this.valoracion = util;
+      }
     } catch (err) {
       console.error('Error al valorar:', err);
     }

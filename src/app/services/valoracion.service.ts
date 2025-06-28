@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment.prod';
 import { Preferences } from '@capacitor/preferences';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -23,5 +24,10 @@ export class ValoracionService {
     const headers = new HttpHeaders({ Authorization: `Bearer ${token.value}` });
     return this.http.get<{ valorado: boolean, util?: boolean }>(`${this.apiUrl}/usuario/${id}`, { headers });
   }
+
+  eliminarValoracion(reporteId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/valoraciones/${reporteId}`);
+  }
+
 
 }

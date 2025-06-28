@@ -9,3 +9,4 @@ router.get('/:id', obtenerResumenValoraciones);
 router.delete('/:id', verifyToken, eliminarValoracion);
 
 module.exports = router;
+

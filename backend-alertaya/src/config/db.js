@@ -15,7 +15,7 @@ function createPoolWithRetry() {
   pool.getConnection((err, connection) => {
     if (err) {
       console.error('❌ Error al conectar a la base de datos:', err.message);
-      setTimeout(createPoolWithRetry, 5000); // Reintenta luego de 5 segundos
+      setTimeout(createPoolWithRetry, 10000); // Reintenta luego de 5 segundos
     } else {
       console.log('🟢 Conexión a MySQL establecida correctamente');
       connection.release();

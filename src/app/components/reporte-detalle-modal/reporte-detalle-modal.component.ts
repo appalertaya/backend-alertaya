@@ -42,21 +42,25 @@ export class ReporteDetalleModalComponent {
 
   async valorar(utilidad: 'util' | 'no_util') {
     if (!this.reporte?.id) return;
+
     try {
-      if (this.valoracion === utilidad) {
-        // Si ya está valorado con la misma opción, eliminarla
-        console.log("this.reporte.id: ",this.reporte.id)
-        await this.valoracionService.eliminarValoracion(this.reporte.id);
-        this.valoracion = null;
-      } else {
-        // Si es nueva o distinta valoración, registrar o actualizar
-        await (
-          await this.valoracionService.valorarReporte(this.reporte.id, utilidad)
-        ).toPromise();
-        this.valoracion = utilidad;
-      }
+      await (
+        await this.valoracionService.valorarReporte(this.reporte.id, utilidad)
+      ).toPromise();
+      this.valoracion = utilidad;
     } catch (err) {
       console.error('Error al valorar:', err);
+    }
+  }
+
+  async quitarValoracion() {
+    if (!this.reporte?.id) return;
+
+    try {
+      await this.valoracionService.eliminarValoracion(this.reporte.id);
+      this.valoracion = null;
+    } catch (err) {
+      console.error('Error al quitar valoración:', err);
     }
   }
 }

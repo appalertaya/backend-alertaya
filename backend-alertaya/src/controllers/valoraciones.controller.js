@@ -70,7 +70,6 @@ const obtenerResumenValoraciones = (req, res) => {
 
 // eliminar valoracion
 const eliminarValoracion = (req, res) => {
-  console.log('🧨 Entró a eliminarValoracion'); // 🔥 Este log es clave
 
   const userEmail = req.user?.email;
   const reporteId = req.params.id;

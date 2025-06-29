@@ -6,15 +6,18 @@ const app = express();
 
 app.use(cors({
   origin: [
-    'http://localhost:8100',        // para desarrollo local (Ionic)
-    'capacitor://localhost',        // para modo desarrollo en dispositivo
-    'ionic://localhost',            // algunos entornos usan esto
-    '*'                             // ⚠️ Aceptar desde todos los orígenes (solo si es necesario)
+    'http://localhost:8100',        // Ionic local
+    'http://localhost:4200',        // Angular local (si aplica)
+    'capacitor://localhost',        // App móvil
+    'ionic://localhost',            // Otras builds móviles
+    'https://backend-alertaya.onrender.com' // para solicitudes internas o futuras
   ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: false  // como usas JWT por headers, esto debe ser false
+  credentials: false
 }));
+app.options('*', cors()); // habilita preflight para todas las rutas
+
 app.use(express.json());
 
 // Rutas principales

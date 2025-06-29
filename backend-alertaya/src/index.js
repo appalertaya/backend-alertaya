@@ -5,15 +5,11 @@ require('dotenv').config();
 const app = express();
 
 // ✅ Middleware de seguridad y formato JSON
-
-// Configurar CORS
 app.use(cors({
-  origin: '*',
+  origin: '*', // o especifica el frontend: 'http://localhost:8100'
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
 app.use(express.json());
 
 // Rutas principales

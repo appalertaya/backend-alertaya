@@ -4,7 +4,12 @@ require('dotenv').config();
 
 const app = express();
 
-app.use(cors()); // 🔥 ¡Deja esto sin configuración extra!
+app.use(cors({
+  origin: '*', // En producción puedes cambiar esto por la URL de tu frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 
 app.use(express.json());
 

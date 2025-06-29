@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getReportes, crearReporte, getMisReportes, eliminarReporte, getReportePorId } = require('../controllers/reportes.controller');
+const { getReportes, crearReporte, getMisReportes, eliminarReporte, getReportePorId, getCantidadPorCategoria } = require('../controllers/reportes.controller');
 const db = require('../config/db');
 const verifyToken = require('../middlewares/auth.middleware');
 
@@ -14,5 +14,8 @@ router.get('/mios', verifyToken, getMisReportes);
 router.get('/:id', getReportePorId);
 // eliminar reportes del backend 
 router.delete('/:id', verifyToken, eliminarReporte);
+
+// Obtener cantidad de reportes por categoría
+router.get('/categorias/cantidad', getCantidadPorCategoria);
 
 module.exports = router;

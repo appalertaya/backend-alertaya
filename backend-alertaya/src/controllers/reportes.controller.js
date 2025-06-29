@@ -179,6 +179,19 @@ const eliminarReporte = (req, res) => {
   });
 };
 
+exports.getCantidadPorCategoria = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT categoria, COUNT(*) as cantidad
+      FROM reportes
+      GROUP BY categoria
+    `);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error al obtener conteo por categoría:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
 
 module.exports = {
   getReportes,

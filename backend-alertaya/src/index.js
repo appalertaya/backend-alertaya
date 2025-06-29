@@ -8,7 +8,7 @@ const app = express();
 
 // Configurar CORS
 app.use(cors({
-  origin: ['http://localhost:8100', 'http://localhost:4200', 'https://alertaya.app', 'capacitor://localhost'],
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true

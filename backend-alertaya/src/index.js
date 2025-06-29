@@ -5,11 +5,16 @@ require('dotenv').config();
 const app = express();
 
 // ✅ Middleware de seguridad y formato JSON
+const cors = require('cors');
+
+// Configurar CORS
 app.use(cors({
-  origin: '*', // o especifica el frontend: 'http://localhost:8100'
+  origin: ['http://localhost:8100', 'http://localhost:4200', 'https://alertaya.app', 'capacitor://localhost'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
+
 app.use(express.json());
 
 // Rutas principales

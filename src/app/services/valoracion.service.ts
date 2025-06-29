@@ -28,8 +28,8 @@ export class ValoracionService {
   async eliminarValoracion(reporteId: number) {
     console.log("reporteId: ",reporteId)
     const token = await Preferences.get({ key: 'token' });
-    console.log('TOKEN QUE SE ENVÍA:', token.value);
     const headers = new HttpHeaders({ Authorization: `Bearer ${token.value}` });
+    console.log("enlace: ",`${this.apiUrl}/${reporteId}`)
     return this.http.delete(`${this.apiUrl}/${reporteId}`, { headers });
   }
 

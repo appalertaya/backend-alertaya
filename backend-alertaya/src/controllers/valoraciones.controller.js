@@ -70,14 +70,16 @@ const obtenerResumenValoraciones = (req, res) => {
 
 // eliminar valoracion
 const eliminarValoracion = (req, res) => {
+  console.log('🧨 Entró a eliminarValoracion'); // 🔥 Este log es clave
+
   const userEmail = req.user?.email;
   const reporteId = req.params.id;
+
+  console.log('Eliminando valoración del usuario:', userEmail, 'para el reporte:', reporteId);
 
   if (!userEmail || !reporteId) {
     return res.status(400).json({ error: 'Datos inválidos' });
   }
-  
-  console.log('Intentando eliminar valoración con:', { reporteId, userEmail });
 
   const sql = 'DELETE FROM valoraciones WHERE reporte_id = ? AND usuario_email = ?';
 
@@ -86,6 +88,7 @@ const eliminarValoracion = (req, res) => {
     res.status(200).json({ mensaje: 'Valoración eliminada' });
   });
 };
+
 
 
 

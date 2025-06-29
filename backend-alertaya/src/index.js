@@ -5,7 +5,6 @@ require('dotenv').config();
 const app = express();
 
 // ✅ Middleware de seguridad y formato JSON
-const cors = require('cors');
 
 // Configurar CORS
 app.use(cors({

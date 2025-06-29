@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { Reporte } from 'src/app/services/reporte.service';
-import { ValoracionService } from 'src/app/services/valoracion.service';
+import { ValoracionService, ValoracionUsuarioResponse } from 'src/app/services/valoracion.service';
 
 @Component({
   selector: 'app-reporte-detalle-modal',
@@ -16,23 +16,19 @@ export class ReporteDetalleModalComponent {
   constructor(
     private modalCtrl: ModalController,
     private valoracionService: ValoracionService
-  ) { }
+  ) {}
 
   async ngOnInit() {
-    if (this.reporte?.id) {
-      try {
-        const response = await (
-          await this.valoracionService.obtenerValoracionUsuario(this.reporte.id)
-        ).toPromise();
-        if (response?.valorado) {
-          this.valoracion = response.util === true ? 'util' : 'no_util';
-        } else {
-          this.valoracion = null;
-        }
+    if (!this.reporte?.id) return;
 
-      } catch (err) {
-        console.warn('Error al obtener valoración previa:', err);
-      }
+    try {
+      const response = await (
+        await this.valoracionService.obtenerValoracionUsuario(this.reporte.id)
+      ).toPromise();
+
+      this.valoracion = response?.valorado ? response.util : null;
+    } catch (err) {
+      console.warn('Error al obtener valoración previa:', err);
     }
   }
 
@@ -44,10 +40,19 @@ export class ReporteDetalleModalComponent {
     if (!this.reporte?.id) return;
 
     try {
-      await (
-        await this.valoracionService.valorarReporte(this.reporte.id, utilidad)
-      ).toPromise();
-      this.valoracion = utilidad;
+      if (this.valoracion === utilidad) {
+        // Si ya estaba valorado con la misma opción, quitar valoración
+        await (
+          await this.valoracionService.eliminarValoracion(this.reporte.id)
+        ).toPromise();
+        this.valoracion = null;
+      } else {
+        // Registrar o cambiar valoración
+        await (
+          await this.valoracionService.valorarReporte(this.reporte.id, utilidad)
+        ).toPromise();
+        this.valoracion = utilidad;
+      }
     } catch (err) {
       console.error('Error al valorar:', err);
     }
@@ -55,9 +60,10 @@ export class ReporteDetalleModalComponent {
 
   async quitarValoracion() {
     if (!this.reporte?.id) return;
-
     try {
-      await this.valoracionService.eliminarValoracion(this.reporte.id);
+      await (
+        await this.valoracionService.eliminarValoracion(this.reporte.id)
+      ).toPromise();
       this.valoracion = null;
     } catch (err) {
       console.error('Error al quitar valoración:', err);

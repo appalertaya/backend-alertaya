@@ -6,7 +6,7 @@ const valorarReporte = (req, res) => {
   const reporteId = req.params.id;
   const { utilidad } = req.body; // tiene que venir como 'util' o 'no_util'
 
-  if (!usuarioEmail || !reporteId || !['util', 'no_util'].includes(utilidad)) {
+  if (!usuarioEmail || !reporteId || !['util', 'no_util', null].includes(utilidad)) {
     return res.status(400).json({ error: 'Datos inválidos' });
   }
 

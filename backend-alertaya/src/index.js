@@ -4,11 +4,16 @@ require('dotenv').config();
 
 const app = express();
 
-// ✅ Middleware de seguridad y formato JSON
 app.use(cors({
-  origin: '*', // o especifica el frontend: 'http://localhost:8100'
+  origin: [
+    'http://localhost:8100',        // para desarrollo local (Ionic)
+    'capacitor://localhost',        // para modo desarrollo en dispositivo
+    'ionic://localhost',            // algunos entornos usan esto
+    '*'                             // ⚠️ Aceptar desde todos los orígenes (solo si es necesario)
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: false  // como usas JWT por headers, esto debe ser false
 }));
 app.use(express.json());
 

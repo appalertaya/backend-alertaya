@@ -6,7 +6,7 @@ import { ReporteService } from 'src/app/services/reporte.service';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { ReporteDetalleModalComponent } from 'src/app/components/reporte-detalle-modal/reporte-detalle-modal.component';
-import { GraficoCategoriasModalComponent } from 'src/app/components/grafico-categorias-modal/grafico-categorias-modal.component';
+import { CategoriasTablaModalComponent } from 'src/app/components/categorias-tabla-modal/categorias-tabla-modal.component';
 
 interface Reporte {
   lat: number;
@@ -263,7 +263,7 @@ export class MapaPage implements AfterViewInit {
 
   async abrirModalGraficoCategorias() {
     const modal = await this.modalController.create({
-      component: GraficoCategoriasModalComponent,
+      component: CategoriasTablaModalComponent,
       cssClass: 'grafico-categorias-modal'
     });
     await modal.present();

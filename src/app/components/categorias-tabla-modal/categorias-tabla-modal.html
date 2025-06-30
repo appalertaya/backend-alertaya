@@ -1,0 +1,25 @@
+<ion-header translucent>
+  <ion-toolbar color="primary">
+    <ion-title>Cantidad por categoría</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list *ngIf="datos.length > 0; else sinDatos">
+    <ion-item *ngFor="let item of datos">
+      <ion-label>
+        <h2>{{ item.categoria }}</h2>
+      </ion-label>
+      <ion-note slot="end">{{ item.cantidad }}</ion-note>
+    </ion-item>
+  </ion-list>
+
+  <ng-template #sinDatos>
+    <ion-text color="medium">No hay datos para mostrar.</ion-text>
+  </ng-template>
+</ion-content>

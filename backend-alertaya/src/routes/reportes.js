@@ -10,12 +10,11 @@ router.get('/', getReportes);
 router.post('/', verifyToken, crearReporte);
 // para obtener reportes por usuario usando el token 
 router.get('/mios', verifyToken, getMisReportes);
+// Obtener cantidad de reportes por categoría
+router.get('/categorias/cantidad', getCantidadPorCategoria);
 // obtener un solo reporte 
 router.get('/:id', getReportePorId);
 // eliminar reportes del backend 
 router.delete('/:id', verifyToken, eliminarReporte);
-
-// Obtener cantidad de reportes por categoría
-router.get('/categorias/cantidad', getCantidadPorCategoria);
 
 module.exports = router;

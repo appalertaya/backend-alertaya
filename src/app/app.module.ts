@@ -11,7 +11,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { GoogleMapsModule } from '@angular/google-maps';
 
 import { ReporteDetalleModalComponent } from './components/reporte-detalle-modal/reporte-detalle-modal.component';
-import { GraficoCategoriasModalModule } from './components/grafico-categorias-modal/grafico-categorias-modal.module';
+import { GraficoCategoriasModalModule } from './components/categorias-tabla-modal/categorias-tabla-modal.module';
 
 @NgModule({
   declarations: [AppComponent, ReporteDetalleModalComponent],

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GraficoCategoriasModalComponent } from './grafico-categorias-modal.component';
+import { GraficoCategoriasModalComponent } from './categorias-tabla-modal.component';
 import { IonicModule } from '@ionic/angular';
 import { NgChartsModule } from 'ng2-charts';
 import { FormsModule } from '@angular/forms';

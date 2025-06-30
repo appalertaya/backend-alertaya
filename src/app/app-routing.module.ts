@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { StartupPage } from './pages/startup/startup.page';
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login',
-    pathMatch: 'full'
+    component: StartupPage,
   },
   {
     path: 'login',
@@ -27,15 +27,9 @@ const routes: Routes = [
   {
     path: 'register',
     loadChildren: () => import('./pages/register/register.module').then(m => m.RegisterPageModule)
-  },
-  {
-    path: 'reporte-detalle/:id',
-    loadChildren: () => import('./pages/reporte-detalle/reporte-detalle.module').then(m => m.ReporteDetallePageModule)
   }
 
-
 ];
-
 
 @NgModule({
   imports: [

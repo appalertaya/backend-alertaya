@@ -6,6 +6,7 @@ import { ReporteService } from 'src/app/services/reporte.service';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { ReporteDetalleModalComponent } from 'src/app/components/reporte-detalle-modal/reporte-detalle-modal.component';
+import { GraficoCategoriasModalComponent } from 'src/app/components/grafico-categorias-modal/grafico-categorias-modal.component';
 
 interface Reporte {
   lat: number;
@@ -186,7 +187,8 @@ export class MapaPage implements AfterViewInit {
         coordinate: { lat: ubicacion.lat, lng: ubicacion.lon },
         title: 'Mi ubicación',
         iconUrl: 'assets/iconos/logoYo.png',
-        iconSize: { width: 36, height: 36 }
+        iconSize: { width: 36, height: 36 },
+        zIndex: 1 // marcador abajo
       });
       if (marcadorId) this.marcadores.push(marcadorId);
     }
@@ -200,7 +202,8 @@ export class MapaPage implements AfterViewInit {
             lng: parseFloat(rep.lng),
           },
           iconUrl: this.getIconoPorCategoria(rep.categoria),
-          iconSize: { width: 32, height: 32 }
+          iconSize: { width: 32, height: 32 },
+          zIndex: 2 // marcador arriba
         });
 
         if (markerId) {
@@ -218,7 +221,7 @@ export class MapaPage implements AfterViewInit {
       if (reporte) {
         const modal = await this.modalController.create({
           component: ReporteDetalleModalComponent,
-          componentProps: { reporte }, 
+          componentProps: { reporte },
           cssClass: 'reporte-detalle-modal',
           backdropDismiss: true,
           showBackdrop: true
@@ -256,6 +259,14 @@ export class MapaPage implements AfterViewInit {
       default:
         return 'assets/iconos/logoOtro.png';
     }
+  }
+
+  async abrirModalGraficoCategorias() {
+    const modal = await this.modalController.create({
+      component: GraficoCategoriasModalComponent,
+      cssClass: 'grafico-categorias-modal'
+    });
+    await modal.present();
   }
 
 }

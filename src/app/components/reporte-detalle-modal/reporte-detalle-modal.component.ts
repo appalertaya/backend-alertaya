@@ -12,14 +12,24 @@ import { ValoracionService, ValoracionUsuarioResponse } from 'src/app/services/v
 export class ReporteDetalleModalComponent {
   @Input() reporte!: Reporte;
   valoracion: 'util' | 'no_util' | null = null;
+  mostrarCoords: boolean = false;
+  fechaFormateada: string = '';
 
   constructor(
     private modalCtrl: ModalController,
     private valoracionService: ValoracionService
-  ) {}
+  ) { }
 
   async ngOnInit() {
     if (!this.reporte?.id) return;
+
+    if (this.reporte?.fechaHora) {
+      const fecha = new Date(this.reporte.fechaHora);
+      this.fechaFormateada = fecha.toISOString().split('T')[0]; // "2025-06-28"
+    }
+
+    if (this.reporte?.lat) this.reporte.lat = Number(this.reporte.lat);
+    if (this.reporte?.lng) this.reporte.lng = Number(this.reporte.lng);
 
     try {
       const response = await (
@@ -27,6 +37,7 @@ export class ReporteDetalleModalComponent {
       ).toPromise();
 
       this.valoracion = response?.valorado ? response.util : null;
+
     } catch (err) {
       console.warn('Error al obtener valoración previa:', err);
     }

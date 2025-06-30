@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { MenuController } from '@ionic/angular';
 import { ConfigService } from './services/config.service';
 import { environment } from 'src/environments/environment';
-
+import { Router } from '@angular/router';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,12 @@ import { environment } from 'src/environments/environment';
   standalone: false,
 })
 export class AppComponent {
-  constructor(private menu: MenuController, private configService: ConfigService) { }
+  constructor(
+    private menu: MenuController,
+    private configService: ConfigService,
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   async ngOnInit() {
     await this.configService.loadConfig();
@@ -21,6 +27,12 @@ export class AppComponent {
 
   cerrarMenu() {
     this.menu.close();
+  }
+
+  async logout() {
+    await this.authService.cerrarSesion();
+    await this.menu.close();
+    this.router.navigate(['/login']);
   }
 
 }

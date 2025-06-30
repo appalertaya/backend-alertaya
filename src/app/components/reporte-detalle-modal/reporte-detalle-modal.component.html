@@ -10,34 +10,51 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-card *ngIf="reporte">
+  <ion-card *ngIf="reporte" class="detalle-reporte-card">
     <ion-card-header>
-      <ion-card-subtitle>{{ reporte.fechaHora }} - {{ reporte.ciudad }}</ion-card-subtitle>
+      <div class="detalle-fecha-ciudad">
+        <ion-text color="medium">
+          <ion-card-subtitle>{{ fechaFormateada }} - {{ reporte.ciudad }}</ion-card-subtitle>
+        </ion-text>
+      </div>
       <ion-card-title>{{ reporte.categoria }}</ion-card-title>
     </ion-card-header>
 
     <ion-card-content>
       <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
-      <p><strong>Ubicación:</strong> Lat {{ reporte.lat }} / Lng {{ reporte.lng }}</p>
 
-      <ion-text color="medium">
-        <p class="ion-text-center">¿Te fue útil este reporte?</p>
-      </ion-text>
-
-      <div class="valoracion-botones ion-text-center">
-        <ion-button [color]="valoracion === 'util' ? 'success' : 'medium'" (click)="valorar('util')">
-          Útil
+      <ng-container *ngIf="reporte.lat && reporte.lng">
+        <ion-button fill="clear" size="small" (click)="mostrarCoords = !mostrarCoords">
+          <ion-icon name="location-outline" slot="start"></ion-icon>
+          {{ mostrarCoords ? 'Ocultar ubicación' : 'Ver ubicación exacta' }}
         </ion-button>
 
-        <ion-button [color]="valoracion === 'no_util' ? 'danger' : 'medium'" (click)="valorar('no_util')">
-          No útil
-        </ion-button>
+        <p *ngIf="mostrarCoords" class="coordenadas">
+          <strong>Ubicación:</strong> Lat {{ reporte.lat | number:'1.4-4' }} / Lng {{ reporte.lng | number:'1.4-4' }}
+        </p>
+      </ng-container>
 
-        <ion-button color="warning" [disabled]="valoracion === null" (click)="quitarValoracion()">
-          Quitar valoración
-        </ion-button>
+      <div class="valoracion-seccion">
+        <ion-text color="medium">
+          <p class="ion-text-center">¿Te fue útil este reporte?</p>
+        </ion-text>
+
+        <div class="valoracion-botones">
+          <ion-button [color]="valoracion === 'util' ? 'success' : 'medium'" (click)="valorar('util')">
+            Útil
+          </ion-button>
+
+          <ion-button [color]="valoracion === 'no_util' ? 'danger' : 'medium'" (click)="valorar('no_util')">
+            No útil
+          </ion-button>
+        </div>
+
+        <div class="quitar-valoracion">
+          <ion-button color="warning" expand="block" [disabled]="valoracion === null" (click)="quitarValoracion()">
+            Quitar valoración
+          </ion-button>
+        </div>
       </div>
-
     </ion-card-content>
   </ion-card>
 

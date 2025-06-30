@@ -64,13 +64,13 @@ export class ReporteService {
     });
   }
 
-getReportePorId(id: number): Promise<Reporte | undefined> {
-  return this.http.get<Reporte>(`${this.apiUrl}/${id}`).toPromise()
-    .catch(err => {
-      console.warn('No se encontró el reporte con ID:', id, err);
-      return undefined;
-    });
-}
+  getReportePorId(id: number): Promise<Reporte | undefined> {
+    return this.http.get<Reporte>(`${this.apiUrl}/${id}`).toPromise()
+      .catch(err => {
+        console.warn('No se encontró el reporte con ID:', id, err);
+        return undefined;
+      });
+  }
 
 
   getReportesDesdeBackend(params: {
@@ -183,6 +183,9 @@ getReportePorId(id: number): Promise<Reporte | undefined> {
     }
   }
 
+  getCantidadPorCategoria() {
+    return this.http.get<{ categoria: string; cantidad: number }[]>(`${this.apiUrl}/categorias/cantidad`);
+  }
 
   async mostrarMensaje(mensaje: string, color: string) {
     const toast = await this.toastController.create({

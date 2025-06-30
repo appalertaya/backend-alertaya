@@ -23,12 +23,16 @@
     placeholder="Ej: 2"></ion-input>
 </ion-item>
 
-<!-- reiniciar filtros -->
+<!-- reiniciar filtros y cantidad de reportes -->
 <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-  <ion-fab-button (click)="reiniciarFiltros()" color="light">
-    <ion-icon name="refresh-outline"></ion-icon>
+  <ion-fab-button (click)="abrirModalGraficoCategorias()" size="small">
+    <ion-icon name="pie-chart-outline"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-button (click)="reiniciarFiltros()" size="small">
+    <ion-icon name="refresh"></ion-icon>
   </ion-fab-button>
 </ion-fab>
+
 
 
 <ion-content fullscreen>

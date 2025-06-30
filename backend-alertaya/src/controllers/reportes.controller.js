@@ -198,7 +198,8 @@ module.exports = {
   crearReporte,
   getMisReportes,
   getReportePorId,
-  eliminarReporte
+  eliminarReporte,
+  getCantidadPorCategoria
 };
 
 

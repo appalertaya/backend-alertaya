@@ -189,8 +189,6 @@ const getReportePorId = async (req, res) => {
   }
 };
 
-
-
 const eliminarReporte = (req, res) => {
   const { id } = req.params;
 

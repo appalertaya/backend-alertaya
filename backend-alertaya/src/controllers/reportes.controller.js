@@ -179,6 +179,7 @@ const getReportePorId = (req, res) => {
 
     const reporte = reporteResults[0];
 
+    
     // Buscar imágenes asociadas
     db.query(sqlImagenes, [id], (err, imagenesResults) => {
       if (err) {

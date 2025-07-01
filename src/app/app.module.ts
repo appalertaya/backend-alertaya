@@ -1,7 +1,7 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
@@ -11,12 +11,31 @@ import { AppRoutingModule } from './app-routing.module';
 import { GoogleMapsModule } from '@angular/google-maps';
 
 import { ReporteDetalleModalComponent } from './components/reporte-detalle-modal/reporte-detalle-modal.component';
-import { GraficoCategoriasModalModule } from './components/categorias-tabla-modal/categorias-tabla-modal.module';
+import { CategoriasTablaModalComponent } from './components/categorias-tabla-modal/categorias-tabla-modal.component';
+
+import { TokenExpiradoInterceptor } from './interceptors/token-expirado.interceptor';
 
 @NgModule({
-  declarations: [AppComponent, ReporteDetalleModalComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, HttpClientModule, GoogleMapsModule, GraficoCategoriasModalModule],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  declarations: [
+    AppComponent,
+    ReporteDetalleModalComponent,
+    CategoriasTablaModalComponent
+  ],
+  imports: [
+    BrowserModule,
+    IonicModule.forRoot(),
+    AppRoutingModule,
+    HttpClientModule,
+    GoogleMapsModule
+  ],
+  providers: [
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenExpiradoInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

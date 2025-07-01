@@ -147,18 +147,32 @@ export class ReporteService {
       for (const r of pendientes) {
         try {
           await this.http.post(this.apiUrl, r, { headers }).toPromise();
-          r.enviado = true;
-          console.log('Reporte sincronizado:', r.fechaHora);
+
+          // Buscar el índice real en el array 'reportes' y actualizarlo
+          const index = reportes.findIndex(orig =>
+            orig.fechaHora === r.fechaHora &&
+            orig.lat === r.lat &&
+            orig.lng === r.lng &&
+            orig.descripcion === r.descripcion
+          );
+
+          if (index !== -1) {
+            reportes[index].enviado = true;
+            console.log('Reporte sincronizado:', reportes[index].fechaHora);
+          }
         } catch (err) {
           console.warn('No se pudo sincronizar reporte:', r.fechaHora, ' Error: ', err);
         }
       }
 
-      // Guardar nuevamente los datos actualizados
+      // Eliminar reportes que ya fueron sincronizados (enviados = true)
+      const noEnviados = reportes.filter(r => !r.enviado);
+
       await Preferences.set({
         key: this.STORAGE_KEY,
-        value: JSON.stringify(reportes)
+        value: JSON.stringify(noEnviados)
       });
+
       return true;
     } catch (error) {
       console.warn('Ocurrió un error al sincronizar los reportes: ', error)

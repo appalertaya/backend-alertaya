@@ -4,26 +4,29 @@ import { ReporteService } from 'src/app/services/reporte.service';
 
 @Component({
   selector: 'categorias-tabla-modal',
-  templateUrl: './categorias-tabla-modal.component.html',
-  styleUrls: ['./categorias-tabla-modal.component.scss'],
+  templateUrl: './categorias-tabla-modal.html',
+  styleUrls: ['./categorias-tabla-modal.scss'],
   standalone: false
 })
 export class CategoriasTablaModalComponent {
 
   datos: { categoria: string; cantidad: number }[] = [];
+  cargando = true;
 
   constructor(
-    private reporteService: ReporteService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private reporteService: ReporteService
   ) { }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.reporteService.getCantidadPorCategoria().subscribe({
       next: (res) => {
         this.datos = res;
+        this.cargando = false;
       },
       error: (err) => {
-        console.error('Error al obtener datos de categorías', err);
+        console.error('Error al cargar cantidades por categoría', err);
+        this.cargando = false;
       }
     });
   }

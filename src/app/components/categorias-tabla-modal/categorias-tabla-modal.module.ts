@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GraficoCategoriasModalComponent } from './categorias-tabla-modal.component';
+import { CategoriasTablaModalComponent } from './categorias-tabla-modal.component';
 import { IonicModule } from '@ionic/angular';
 import { NgChartsModule } from 'ng2-charts';
 import { FormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [GraficoCategoriasModalComponent],
+  declarations: [CategoriasTablaModalComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -14,4 +14,4 @@ import { FormsModule } from '@angular/forms';
     NgChartsModule
   ],
 })
-export class GraficoCategoriasModalModule {}
+export class CategoriasTablaModalModule {}

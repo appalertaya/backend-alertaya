@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { Reporte } from 'src/app/services/reporte.service';
 import { ValoracionService, ValoracionUsuarioResponse } from 'src/app/services/valoracion.service';
+import { ReporteService } from 'src/app/services/reporte.service';
 
 @Component({
   selector: 'app-reporte-detalle-modal',
@@ -18,16 +19,22 @@ export class ReporteDetalleModalComponent {
 
   constructor(
     private modalCtrl: ModalController,
-    private valoracionService: ValoracionService
+    private valoracionService: ValoracionService,
+    private reporteService: ReporteService
   ) { }
 
   async ngOnInit() {
     // viene reporte
     if (!this.reporte?.id) return;
-    console.log("reporte: ",this.reporte)
+
+    // detalle
+    const detalle = await this.reporteService.getReportePorId(this.reporte.id);
+    if (!detalle) return;
+
     // fecha
     if (this.reporte?.fechaHora) {
       const fecha = new Date(this.reporte.fechaHora);
+      this.reporte = detalle;
       this.fechaFormateada = fecha.toISOString().split('T')[0]; // "2025-06-28"
     }
 
@@ -36,14 +43,13 @@ export class ReporteDetalleModalComponent {
     if (this.reporte?.lng) this.reporte.lng = Number(this.reporte.lng);
 
     // imagenes
-    if (this.reporte && Array.isArray((this.reporte as any).imagenes)) {
-      this.imagenes = (this.reporte as any).imagenes;
-      console.log("this.imagenes: ",this.imagenes)
-    }
+    this.imagenes = Array.isArray((detalle as any).imagenes) ? (detalle as any).imagenes : [];
+    console.log("Detalle con imágenes:", this.reporte);
+    console.log("this.imagenes:", this.imagenes);
 
     try {
       const response = await (
-        await this.valoracionService.obtenerValoracionUsuario(this.reporte.id)
+        await this.valoracionService.obtenerValoracionUsuario(this.reporte.id!)
       ).toPromise();
 
       this.valoracion = response?.valorado ? response.util : null;

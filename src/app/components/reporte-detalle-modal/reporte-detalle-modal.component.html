@@ -42,11 +42,12 @@
         <p><strong>Imágenes asociadas:</strong></p>
       </ion-text>
 
-      <ion-slides *ngIf="imagenes.length > 0" [options]="{ slidesPerView: 1.2 }">
-        <ion-slide *ngFor="let img of imagenes">
-          <ion-img [src]="img" style="border-radius: 10px; height: 200px; object-fit: cover;"></ion-img>
+      <ion-slides *ngIf="imagenes.length > 0" [options]="{ slidesPerView: 1.2, spaceBetween: 12 }">
+        <ion-slide *ngFor="let img of imagenes" class="slide-imagen">
+          <ion-img [src]="img" class="imagen-reporte"></ion-img>
         </ion-slide>
       </ion-slides>
+
 
       <!-- valoracion -->
       <div class="valoracion-seccion">
@@ -69,15 +70,6 @@
             Quitar valoración
           </ion-button>
         </div>
-      </div>
-
-      <div *ngIf="imagenes.length > 0">
-        <h4>Imágenes</h4>
-        <ion-slides [options]="{ slidesPerView: 1.2, spaceBetween: 10 }">
-          <ion-slide *ngFor="let img of imagenes">
-            <ion-img [src]="img"></ion-img>
-          </ion-slide>
-        </ion-slides>
       </div>
 
     </ion-card-content>

@@ -38,4 +38,16 @@
       text-align: center;
     }
   }
+
+  .slide-imagen {
+    padding: 4px 6px;
+  }
+
+  .imagen-reporte {
+    border-radius: 10px;
+    height: 200px;
+    object-fit: cover;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
 }

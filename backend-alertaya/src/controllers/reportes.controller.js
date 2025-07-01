@@ -15,6 +15,10 @@ const getReportes = (req, res) => {
 
   const query = 'SELECT * FROM reportes';
 
+  // imagenes
+  const streamifier = require('streamifier');
+  const cloudinary = require('../config/cloudinary');
+
 
   db.getConnection((err, connection) => {
     if (err) {
@@ -72,9 +76,6 @@ const getReportes = (req, res) => {
     });
   });
 };
-
-const streamifier = require('streamifier');
-const cloudinary = require('../config/cloudinary');
 
 const crearReporte = async (req, res) => {
   const { descripcion, lat, lng, ciudad, fechaHora, enviado, categoria } = req.body;
@@ -189,24 +190,43 @@ const getReportePorId = async (req, res) => {
   }
 };
 
-const eliminarReporte = (req, res) => {
+const eliminarReporte = async (req, res) => {
   const { id } = req.params;
 
-  const sql = 'DELETE FROM reportes WHERE id = ?';
+  try {
+    // 1. Obtener imágenes asociadas al reporte
+    const [imagenes] = await db.promise().query(
+      'SELECT public_id FROM ImagenesReporte WHERE id_reporte = ?',
+      [id]
+    );
 
-  db.query(sql, [id], (err, result) => {
-    if (err) {
-      console.error('Error al eliminar reporte:', err);
-      return res.status(500).json({ error: 'Error al eliminar reporte' });
+    // 2. Eliminar imágenes de Cloudinary
+    for (const img of imagenes) {
+      try {
+        await cloudinary.uploader.destroy(img.public_id);
+        console.log(`Imagen eliminada de Cloudinary: ${img.public_id}`);
+      } catch (err) {
+        console.warn(`Error eliminando imagen en Cloudinary (${img.public_id}):`, err.message);
+      }
     }
+
+    // 3. Eliminar registros de imágenes en BD
+    await db.promise().query('DELETE FROM ImagenesReporte WHERE id_reporte = ?', [id]);
+
+    // 4. Eliminar el reporte
+    const [result] = await db.promise().query('DELETE FROM reportes WHERE id = ?', [id]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Reporte no encontrado' });
     }
 
-    res.status(200).json({ mensaje: 'Reporte eliminado correctamente' });
-  });
+    res.status(200).json({ mensaje: 'Reporte e imágenes eliminadas correctamente' });
+  } catch (err) {
+    console.error('Error al eliminar reporte e imágenes:', err);
+    res.status(500).json({ error: 'Error interno al eliminar el reporte' });
+  }
 };
+
 
 const getCantidadPorCategoria = (req, res) => {
   const sql = `

@@ -96,7 +96,7 @@ const crearReporte = async (req, res) => {
       INSERT INTO reportes (descripcion, lat, lng, ciudad, fechaHora, enviado, categoria, usuarioId)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const valores = [descripcion, lat, lng, ciudad, fechaHora, enviado ?? true, categoria, usuarioId];
+    const valores = [descripcion, lat, lng, ciudad, fechaHora, enviado !== undefined ? (enviado ? 1 : 0) : 1, categoria, usuarioId];
     const [resultado] = await db.promise().query(sqlReporte, valores);
     const idReporte = resultado.insertId;
 

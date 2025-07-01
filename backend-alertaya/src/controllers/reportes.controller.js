@@ -132,6 +132,7 @@ const crearReporte = async (req, res) => {
   }
 };
 
+
 const getMisReportes = (req, res) => {
   console.log(req.user)
   const token = req.headers.authorization?.split(' ')[1];

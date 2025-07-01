@@ -30,32 +30,40 @@ export class ReporteService {
 
   constructor(private http: HttpClient, private toastController: ToastController, private configService: ConfigService) { }
 
-  async guardarReporte(reporte: Reporte): Promise<void> {
-    console.log("reporte: ", reporte)
+  async guardarReporte(formData: FormData): Promise<void> {
     const { value } = await Preferences.get({ key: this.STORAGE_KEY });
     const reportesLocales: Reporte[] = value ? JSON.parse(value) : [];
 
-    const { value: userEmail } = await Preferences.get({ key: 'email' }); // obtener email actual
+    const { value: userEmail } = await Preferences.get({ key: 'email' });
+
+    // Extraer los datos del formulario para guardar copia local
+    const nuevoReporte: Reporte = {
+      descripcion: formData.get('descripcion') as string,
+      lat: parseFloat(formData.get('lat') as string),
+      lng: parseFloat(formData.get('lng') as string),
+      ciudad: formData.get('ciudad') as string,
+      fechaHora: formData.get('fechaHora') as string,
+      enviado: true,
+      categoria: formData.get('categoria') as string,
+      creadorEmail: userEmail ?? undefined
+    };
 
     try {
       const { value: token } = await Preferences.get({ key: 'token' });
-      // console.log('TOKEN ACTUAL:', value);
-      const headers = new HttpHeaders({
-        Authorization: `Bearer ${token}`
-      });
-      // console.log('Authorization Header:', headers.get('Authorization'));
 
-      await this.http.post(this.apiUrl, reporte, { headers }).toPromise();
-      console.log('Reporte enviado al backend correctamente');
-      reportesLocales.push({ ...reporte, enviado: true, creadorEmail: userEmail ?? undefined });
+      const headers = {
+        Authorization: `Bearer ${token}`
+      };
+
+      await this.http.post(this.apiUrl, formData, { headers }).toPromise();
+      console.log('✅ Reporte enviado al backend correctamente');
+
+      reportesLocales.push(nuevoReporte);
+
     } catch (error: any) {
-      console.warn('No se pudo enviar el reporte al backend. Guardando localmente.', error);
-      if (error.status === 0) {
-        console.warn('El servidor no está disponible.');
-      } else {
-        console.warn('Error al insertar reporte:', error);
-      }
-      reportesLocales.push({ ...reporte, enviado: false, creadorEmail: userEmail ?? undefined });
+      console.warn('⚠️ No se pudo enviar el reporte al backend. Guardando localmente.', error);
+      nuevoReporte.enviado = false;
+      reportesLocales.push(nuevoReporte);
     }
 
     await Preferences.set({
@@ -63,6 +71,8 @@ export class ReporteService {
       value: JSON.stringify(reportesLocales)
     });
   }
+
+
 
   getReportePorId(id: number): Promise<Reporte | undefined> {
     return this.http.get<Reporte>(`${this.apiUrl}/${id}`).toPromise()
@@ -200,6 +210,18 @@ export class ReporteService {
   getCantidadPorCategoria() {
     return this.http.get<{ categoria: string; cantidad: number }[]>(`${this.apiUrl}/categorias/cantidad`);
   }
+
+  subirReporteConImagenes(formData: FormData) {
+    const token = localStorage.getItem('token'); // o Preferences si usas Capacitor
+
+    return this.http.post(`${this.apiUrl}`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).toPromise();
+  }
+
+
 
   async mostrarMensaje(mensaje: string, color: string) {
     const toast = await this.toastController.create({

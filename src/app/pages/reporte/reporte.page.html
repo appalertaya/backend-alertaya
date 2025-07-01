@@ -43,6 +43,29 @@
       <ion-textarea [(ngModel)]="descripcion" name="descripcion" required></ion-textarea>
     </ion-item>
 
+    <ion-item>
+      <ion-label>Imágenes (mín. 2)</ion-label>
+      <input type="file" accept="image/*" multiple (change)="onImagenesSeleccionadas($event)">
+    </ion-item>
+
+    <ion-grid *ngIf="imagenes.length > 0">
+      <ion-row>
+        <ion-col size="4" *ngFor="let img of imagenes">
+          <img [src]="img | imagenPreview" style="width: 100%; border-radius: 8px;" />
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+
+    <ion-grid *ngIf="imagenes.length > 0">
+      <ion-row>
+        <ion-col size="4" *ngFor="let img of imagenes">
+          <img [src]="img | imagenPreview" style="width: 100%; border-radius: 8px;" />
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+
     <ion-item *ngIf="ubicacion">
       <ion-label>Ubicación actual</ion-label>
       <ion-text>

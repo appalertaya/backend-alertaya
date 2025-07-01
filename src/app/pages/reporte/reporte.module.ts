@@ -10,12 +10,15 @@ import { ReportePage } from './reporte.page';
 
 import { SafeUrlPipe } from 'src/app/safe-url.pipe';
 
+import { ImagenPreviewPipe } from 'src/app/pipes/imagen-preview.pipe';
+
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    ReportePageRoutingModule
+    ReportePageRoutingModule,
+    ImagenPreviewPipe
   ],
   declarations: [ReportePage, SafeUrlPipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

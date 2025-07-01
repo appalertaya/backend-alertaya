@@ -3,6 +3,7 @@ import { GeolocationService } from 'src/app/services/geolocalizacion.service';
 import { PermisosGPSInternetService } from 'src/app/services/permisos.service';
 import { ToastController } from '@ionic/angular';
 import { ReporteService, Reporte } from 'src/app/services/reporte.service';
+import { ImagenPreviewPipe } from 'src/app/pipes/imagen-preview.pipe';
 
 @Component({
   selector: 'app-reporte',
@@ -18,6 +19,7 @@ export class ReportePage {
   gpsListo: boolean = false;
   cargando: boolean = true;
   categoriaSeleccionada: string = '';
+  imagenes: File[] = [];
 
   constructor(
     private geoService: GeolocationService,
@@ -45,7 +47,7 @@ export class ReportePage {
       const sincronizar = this.reporteService.sincronizarReportesPendientes();
       if (await sincronizar) {
         this.mostrarMensaje('Reportes pendientes sincronizados con éxito.', 'success')
-      }else{
+      } else {
         console.log("No se pudieron sincronizar los reportes pendientes.")
       }
 
@@ -82,8 +84,22 @@ export class ReportePage {
   async enviarReporte() {
     this.error = '';
 
-    const gpsOk = await this.permisosService.verificarGPSyPermisos();
+    if (this.descripcion.trim().length < 20) {
+      this.mostrarMensaje('El reporte debe tener al menos 20 caractéres.', 'warning');
+      return;
+    }
 
+    if (!this.categoriaSeleccionada) {
+      this.mostrarMensaje('Debes seleccionar la categoría del reporte.', 'warning');
+      return;
+    }
+
+    if (this.imagenes.length < 2) {
+      this.mostrarMensaje('Debes adjuntar al menos 2 imágenes.', 'warning');
+      return;
+    }
+
+    const gpsOk = await this.permisosService.verificarGPSyPermisos();
     if (!gpsOk) {
       this.mostrarMensaje('Debes activar el GPS para enviar un reporte.', 'danger');
       return;
@@ -96,46 +112,48 @@ export class ReportePage {
     }
 
     const ciudad = await this.geoService.obtenerCiudad(ubicacionActual.lat, ubicacionActual.lon);
-    const fechaHora = new Date().toISOString().split('.')[0]; // sin milisegundos 'YYYY-MM-DDTHH:mm:ss' '2025-05-23T01:01:08'
+    const fechaHora = new Date().toISOString().split('.')[0];
 
-    const nuevoReporte: Reporte = {
-      descripcion: this.descripcion,
-      lat: ubicacionActual.lat,
-      lng: ubicacionActual.lon,
-      ciudad: ciudad || 'Desconocida',
-      fechaHora,
-      enviado: true,
-      categoria: this.categoriaSeleccionada
-    };
+    const formData = new FormData();
+    formData.append('descripcion', this.descripcion);
+    formData.append('lat', String(ubicacionActual.lat));
+    formData.append('lng', String(ubicacionActual.lon));
+    formData.append('ciudad', ciudad || 'Desconocida');
+    formData.append('fechaHora', fechaHora);
+    formData.append('enviado', 'true');
+    formData.append('categoria', this.categoriaSeleccionada);
 
-    if (this.descripcion.trim().length < 20) {
-      this.mostrarMensaje('El reporte debe tener al menos 20 caractéres.', 'warning');
-      return;
-    }
-
-    if (!this.categoriaSeleccionada) {
-      this.mostrarMensaje('Debes seleccionar la categoría del reporte.', 'warning');
-      return;
-    }
+    this.imagenes.forEach((img, index) => {
+      formData.append('imagenes', img);
+    });
 
     try {
-      await this.reporteService.guardarReporte(nuevoReporte);
-      const actualizado = await this.reporteService.getReportesLocales();
-      const ultimo = actualizado[actualizado.length - 1];
-
-      if (ultimo.enviado) {
-        this.mostrarMensaje('Reporte enviado con éxito', 'success');
-      } else {
-        this.mostrarMensaje('Algo falló, revise su conexión a internet y GPS', 'danger')
-      }
-
+      await this.reporteService.guardarReporte(formData);
+      this.mostrarMensaje('Reporte enviado con éxito', 'success');
+      this.descripcion = '';
+      this.categoriaSeleccionada = '';
+      this.imagenes = [];
     } catch (err) {
       this.mostrarMensaje('Ocurrió un error inesperado', 'danger');
     }
-
-    this.descripcion = '';
-    this.categoriaSeleccionada = '';
   }
+
+
+
+  onImagenesSeleccionadas(event: any) {
+    const archivos: FileList = event.target.files;
+
+    this.imagenes = [];
+    for (let i = 0; i < archivos.length; i++) {
+      this.imagenes.push(archivos[i]);
+    }
+
+    if (this.imagenes.length < 2) {
+      this.mostrarMensaje('Debes seleccionar al menos 2 imágenes.', 'warning');
+    }
+  }
+
+
 
   async mostrarMensaje(mensaje: string, color: string) {
     const toast = await this.toastController.create({

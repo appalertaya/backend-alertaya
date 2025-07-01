@@ -163,21 +163,35 @@ const getMisReportes = (req, res) => {
 
 const getReportePorId = (req, res) => {
   const { id } = req.params;
-  const sql = 'SELECT * FROM reportes WHERE id = ?';
 
-  db.query(sql, [id], (err, results) => {
+  const sqlReporte = 'SELECT * FROM reportes WHERE id = ?';
+  const sqlImagenes = 'SELECT url_imagen FROM ImagenesReporte WHERE id_reporte = ?';
+
+  db.query(sqlReporte, [id], (err, reporteResults) => {
     if (err) {
       console.error('Error al obtener reporte por ID:', err);
       return res.status(500).json({ error: 'Error al obtener el reporte' });
     }
 
-    if (results.length === 0) {
+    if (reporteResults.length === 0) {
       return res.status(404).json({ error: 'Reporte no encontrado' });
     }
 
-    res.json(results[0]);
+    const reporte = reporteResults[0];
+
+    // Buscar imágenes asociadas
+    db.query(sqlImagenes, [id], (err, imagenesResults) => {
+      if (err) {
+        console.error('Error al obtener imágenes del reporte:', err);
+        return res.status(500).json({ error: 'Error al obtener imágenes del reporte' });
+      }
+
+      reporte.imagenes = imagenesResults.map(img => img.url_imagen);
+      res.json(reporte);
+    });
   });
 };
+
 
 
 const eliminarReporte = (req, res) => {

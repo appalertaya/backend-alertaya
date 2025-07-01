@@ -15,6 +15,7 @@ export class ReportePage {
 
   descripcion: string = '';
   ubicacion: { lat: number; lng: number } | null = null;
+  mostrarCoords: boolean = false;
   error: string = '';
   gpsListo: boolean = false;
   cargando: boolean = true;
@@ -44,12 +45,12 @@ export class ReportePage {
       }
 
       // para sincronizar reportes pendientes 
-      const sincronizar = this.reporteService.sincronizarReportesPendientes();
-      if (await sincronizar) {
-        this.mostrarMensaje('Reportes pendientes sincronizados con éxito.', 'success')
-      } else {
-        console.log("No se pudieron sincronizar los reportes pendientes.")
-      }
+      // const sincronizar = this.reporteService.sincronizarReportesPendientes();
+      // if (await sincronizar) {
+      //   this.mostrarMensaje('Reportes pendientes sincronizados con éxito.', 'success')
+      // } else {
+      //   console.log("No se pudieron sincronizar los reportes pendientes.")
+      // }
 
       const ubicacion = await this.geoService.getCurrentPosition();
       if (ubicacion) {

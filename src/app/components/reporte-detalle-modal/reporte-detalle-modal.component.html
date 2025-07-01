@@ -55,6 +55,16 @@
           </ion-button>
         </div>
       </div>
+
+      <div *ngIf="reporte.imagenes?.length">
+        <h4>Imágenes</h4>
+        <ion-slides [options]="{ slidesPerView: 1.2, spaceBetween: 10 }">
+          <ion-slide *ngFor="let img of reporte.imagenes">
+            <ion-img [src]="img.url_imagen"></ion-img>
+          </ion-slide>
+        </ion-slides>
+      </div>
+
     </ion-card-content>
   </ion-card>
 

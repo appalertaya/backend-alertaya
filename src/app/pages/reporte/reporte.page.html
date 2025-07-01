@@ -44,17 +44,10 @@
     </ion-item>
 
     <ion-item>
-      <ion-label>Imágenes (mín. 2)</ion-label>
-      <input type="file" accept="image/*" multiple (change)="onImagenesSeleccionadas($event)">
+      <ion-label position="stacked">Imágenes (mínimo 2)</ion-label>
+      <input type="file" (change)="onImagenesSeleccionadas($event)" accept="image/*" multiple
+        style="margin-top: 8px;" />
     </ion-item>
-
-    <ion-grid *ngIf="imagenes.length > 0">
-      <ion-row>
-        <ion-col size="4" *ngFor="let img of imagenes">
-          <img [src]="img | imagenPreview" style="width: 100%; border-radius: 8px;" />
-        </ion-col>
-      </ion-row>
-    </ion-grid>
 
 
     <ion-grid *ngIf="imagenes.length > 0">
@@ -67,10 +60,14 @@
 
 
     <ion-item *ngIf="ubicacion">
-      <ion-label>Ubicación actual</ion-label>
-      <ion-text>
-        {{ ubicacion.lat }}, {{ ubicacion.lng }}
-      </ion-text>
+      <ion-button fill="clear" size="small" (click)="mostrarCoords = !mostrarCoords">
+        <ion-icon name="location-outline" slot="start"></ion-icon>
+        {{ mostrarCoords ? 'Ocultar ubicación' : 'Ver ubicación exacta' }}
+      </ion-button>
+      <div *ngIf="mostrarCoords" class="coordenadas">
+        <div><strong>Lat:</strong> {{ ubicacion.lat | number:'1.4-4' }}</div>
+        <div><strong>Lng:</strong> {{ ubicacion.lng | number:'1.4-4' }}</div>
+      </div>
     </ion-item>
 
     <ion-button expand="block" type="submit" [disabled]="!ubicacion">

@@ -211,18 +211,6 @@ export class ReporteService {
     return this.http.get<{ categoria: string; cantidad: number }[]>(`${this.apiUrl}/categorias/cantidad`);
   }
 
-  subirReporteConImagenes(formData: FormData) {
-    const token = localStorage.getItem('token'); // o Preferences si usas Capacitor
-
-    return this.http.post(`${this.apiUrl}`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }).toPromise();
-  }
-
-
-
   async mostrarMensaje(mensaje: string, color: string) {
     const toast = await this.toastController.create({
       message: mensaje,

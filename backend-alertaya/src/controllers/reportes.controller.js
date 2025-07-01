@@ -73,44 +73,63 @@ const getReportes = (req, res) => {
   });
 };
 
-const crearReporte = (req, res) => {
-  const { descripcion, lat, lng, ciudad, fechaHora, enviado, categoria, imagenUrl } = req.body;
-  console.log('Datos recibidos en POST:', req.body);
+const streamifier = require('streamifier');
+const cloudinary = require('../config/cloudinary');
 
+const crearReporte = async (req, res) => {
+  const { descripcion, lat, lng, ciudad, fechaHora, enviado, categoria } = req.body;
   const usuarioId = req.user?.id;
 
-  if (!usuarioId) {
-    return res.status(401).json({ error: 'Usuario no autenticado' });
-  }
+  if (!usuarioId) return res.status(401).json({ error: 'Usuario no autenticado' });
 
   if (!descripcion || !lat || !lng || !ciudad || !fechaHora || !categoria) {
     return res.status(400).json({ error: 'Faltan campos obligatorios' });
   }
 
-  const sql = `
-    INSERT INTO reportes (descripcion, lat, lng, ciudad, fechaHora, enviado, categoria, imagenUrl, usuarioId)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
+  if (!req.files || req.files.length < 2) {
+    return res.status(400).json({ error: 'Debe subir al menos 2 imágenes' });
+  }
 
-  const valores = [
-    descripcion,
-    lat,
-    lng,
-    ciudad,
-    fechaHora,
-    enviado ?? true,
-    categoria,
-    imagenUrl ?? '',
-    usuarioId
-  ];
+  try {
+    // Insertar reporte
+    const sqlReporte = `
+      INSERT INTO reportes (descripcion, lat, lng, ciudad, fechaHora, enviado, categoria, usuarioId)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const valores = [descripcion, lat, lng, ciudad, fechaHora, enviado ?? true, categoria, usuarioId];
+    const [resultado] = await db.promise().query(sqlReporte, valores);
+    const idReporte = resultado.insertId;
 
-  db.query(sql, valores, (err, results) => {
-    if (err) {
-      console.error('Error al insertar reporte:', err);
-      return res.status(500).json({ error: 'Error al insertar reporte' });
+
+    // Subir imágenes a Cloudinary y registrar en la BD
+    for (const file of req.files) {
+      const resultadoCloudinary = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'alertaya/reportes' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        streamifier.createReadStream(file.buffer).pipe(stream);
+      });
+
+      const sqlImagen = `
+        INSERT INTO ImagenesReporte (id_reporte, url_imagen, public_id)
+        VALUES (?, ?, ?)
+      `;
+      await db.promise().query(sqlImagen, [
+        idReporte,
+        resultadoCloudinary.secure_url,
+        resultadoCloudinary.public_id
+      ]);
     }
-    res.status(201).json({ mensaje: 'Reporte guardado', id: results.insertId });
-  });
+
+    res.status(201).json({ mensaje: 'Reporte creado con imágenes', id: idReporte });
+  } catch (err) {
+    console.error('Error al crear reporte:', err);
+    res.status(500).json({ error: 'Error al crear el reporte' });
+  }
 };
 
 const getMisReportes = (req, res) => {

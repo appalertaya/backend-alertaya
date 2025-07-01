@@ -13,17 +13,42 @@ const valorarReporte = (req, res) => {
   const fecha = new Date();
 
   const sql = `
-  INSERT INTO valoraciones (reporte_id, usuario_email, utilidad, fecha)
-  VALUES (?, ?, ?, ?)
-  ON DUPLICATE KEY UPDATE utilidad = VALUES(utilidad), fecha = VALUES(fecha)
-`;
+    INSERT INTO valoraciones (reporte_id, usuario_email, utilidad, fecha)
+    VALUES (?, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE utilidad = VALUES(utilidad), fecha = VALUES(fecha)
+  `;
 
   db.query(sql, [reporteId, usuarioEmail, utilidad, fecha], (err) => {
     if (err) return res.status(500).json({ error: 'Error al registrar valoración' });
-    res.status(200).json({ mensaje: 'Valoración registrada' });
-  });
 
+    // Verificar cantidad de valoraciones positivas
+    const sqlCount = `
+      SELECT COUNT(*) AS utiles
+      FROM valoraciones
+      WHERE reporte_id = ? AND utilidad = 'util'
+    `;
+
+    db.query(sqlCount, [reporteId], (err2, results) => {
+      if (err2) return res.status(500).json({ error: 'Valor registrada, pero error al contar votos' });
+
+      const utiles = results[0].utiles;
+      const umbral = 3;
+
+      // Si cumple con el umbral, marcar como confiable
+      const esConfiable = utiles >= umbral ? 1 : 0;
+      const sqlUpdate = `UPDATE reportes SET esConfiable = ? WHERE id = ?`;
+
+      db.query(sqlUpdate, [esConfiable, reporteId], (err3) => {
+        if (err3) {
+          return res.status(500).json({ error: 'Valor registrada, pero error al actualizar confiabilidad' });
+        }
+
+        return res.status(200).json({ mensaje: 'Valoración registrada', confiable: esConfiable === 1 });
+      });
+    });
+  });
 };
+
 
 
 // obtener valoracion de usuario 

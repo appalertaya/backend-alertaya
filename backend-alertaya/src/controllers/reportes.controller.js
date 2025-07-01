@@ -128,7 +128,7 @@ const crearReporte = async (req, res) => {
     res.status(201).json({ mensaje: 'Reporte creado con imágenes', id: idReporte });
   } catch (err) {
     console.error('Error al crear reporte:', err);
-    res.status(500).json({ error: 'Error al crear el reporte' });
+    res.status(500).json({ error: 'Error al crear el reporte', detalle: err.message || err });
   }
 };
 

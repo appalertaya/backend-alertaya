@@ -21,6 +21,7 @@
     "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.14.1",
     "nodemailer": "^7.0.3",
-    "prisma": "^6.8.2"
+    "prisma": "^6.8.2",
+    "streamifier": "^0.1.1"
   }
 }

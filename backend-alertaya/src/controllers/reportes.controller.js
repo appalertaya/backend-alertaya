@@ -161,36 +161,32 @@ const getMisReportes = (req, res) => {
   });
 };
 
-const getReportePorId = (req, res) => {
+const getReportePorId = async (req, res) => {
   const { id } = req.params;
 
-  const sqlReporte = 'SELECT * FROM reportes WHERE id = ?';
-  const sqlImagenes = 'SELECT url_imagen FROM ImagenesReporte WHERE id_reporte = ?';
-
-  db.query(sqlReporte, [id], (err, reporteResults) => {
-    if (err) {
-      console.error('Error al obtener reporte por ID:', err);
-      return res.status(500).json({ error: 'Error al obtener el reporte' });
-    }
-
-    if (reporteResults.length === 0) {
+  try {
+    // Obtener reporte
+    const [reportes] = await db.promise().query('SELECT * FROM reportes WHERE id = ?', [id]);
+    if (reportes.length === 0) {
       return res.status(404).json({ error: 'Reporte no encontrado' });
     }
 
-    const reporte = reporteResults[0];
+    const reporte = reportes[0];
 
-    
-    // Buscar imágenes asociadas
-    db.query(sqlImagenes, [id], (err, imagenesResults) => {
-      if (err) {
-        console.error('Error al obtener imágenes del reporte:', err);
-        return res.status(500).json({ error: 'Error al obtener imágenes del reporte' });
-      }
+    // Obtener imágenes asociadas
+    const [imagenes] = await db.promise().query(
+      'SELECT url_imagen FROM ImagenesReporte WHERE id_reporte = ?',
+      [id]
+    );
 
-      reporte.imagenes = imagenesResults.map(img => img.url_imagen);
-      res.json(reporte);
-    });
-  });
+    // Adjuntar arreglo de URLs al reporte
+    reporte.imagenes = imagenes.map((img) => img.url_imagen);
+
+    res.json(reporte);
+  } catch (err) {
+    console.error('Error al obtener reporte con imágenes:', err);
+    res.status(500).json({ error: 'Error al obtener el reporte', detalle: err.message });
+  }
 };
 
 

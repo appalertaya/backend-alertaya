@@ -14,6 +14,7 @@ export class ReporteDetalleModalComponent {
   valoracion: 'util' | 'no_util' | null = null;
   mostrarCoords: boolean = false;
   fechaFormateada: string = '';
+  imagenes: string[] = [];
 
   constructor(
     private modalCtrl: ModalController,
@@ -21,15 +22,24 @@ export class ReporteDetalleModalComponent {
   ) { }
 
   async ngOnInit() {
+    // viene reporte
     if (!this.reporte?.id) return;
-
+    console.log("reporte: ",this.reporte)
+    // fecha
     if (this.reporte?.fechaHora) {
       const fecha = new Date(this.reporte.fechaHora);
       this.fechaFormateada = fecha.toISOString().split('T')[0]; // "2025-06-28"
     }
 
+    // latitud y longitud
     if (this.reporte?.lat) this.reporte.lat = Number(this.reporte.lat);
     if (this.reporte?.lng) this.reporte.lng = Number(this.reporte.lng);
+
+    // imagenes
+    if (this.reporte && Array.isArray((this.reporte as any).imagenes)) {
+      this.imagenes = (this.reporte as any).imagenes;
+      console.log("this.imagenes: ",this.imagenes)
+    }
 
     try {
       const response = await (

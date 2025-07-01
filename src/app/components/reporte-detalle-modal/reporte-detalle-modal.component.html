@@ -21,19 +21,34 @@
     </ion-card-header>
 
     <ion-card-content>
+      <!-- descripcion -->
       <p><strong>Descripción:</strong> {{ reporte.descripcion }}</p>
 
+      <!-- ubicacion -->
       <ng-container *ngIf="reporte.lat && reporte.lng">
         <ion-button fill="clear" size="small" (click)="mostrarCoords = !mostrarCoords">
           <ion-icon name="location-outline" slot="start"></ion-icon>
           {{ mostrarCoords ? 'Ocultar ubicación' : 'Ver ubicación exacta' }}
         </ion-button>
 
+        <!-- mostrar coordenadas -->
         <p *ngIf="mostrarCoords" class="coordenadas">
           <strong>Ubicación:</strong> Lat {{ reporte.lat | number:'1.4-4' }} / Lng {{ reporte.lng | number:'1.4-4' }}
         </p>
       </ng-container>
 
+      <!-- imagenes -->
+      <ion-text color="medium" *ngIf="imagenes.length > 0">
+        <p><strong>Imágenes asociadas:</strong></p>
+      </ion-text>
+
+      <ion-slides *ngIf="imagenes.length > 0" [options]="{ slidesPerView: 1.2 }">
+        <ion-slide *ngFor="let img of imagenes">
+          <ion-img [src]="img" style="border-radius: 10px; height: 200px; object-fit: cover;"></ion-img>
+        </ion-slide>
+      </ion-slides>
+
+      <!-- valoracion -->
       <div class="valoracion-seccion">
         <ion-text color="medium">
           <p class="ion-text-center">¿Te fue útil este reporte?</p>
@@ -56,11 +71,11 @@
         </div>
       </div>
 
-      <div *ngIf="reporte.imagenes?.length">
+      <div *ngIf="imagenes.length > 0">
         <h4>Imágenes</h4>
         <ion-slides [options]="{ slidesPerView: 1.2, spaceBetween: 10 }">
-          <ion-slide *ngFor="let img of reporte.imagenes">
-            <ion-img [src]="img.url_imagen"></ion-img>
+          <ion-slide *ngFor="let img of imagenes">
+            <ion-img [src]="img"></ion-img>
           </ion-slide>
         </ion-slides>
       </div>

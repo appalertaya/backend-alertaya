@@ -15,10 +15,6 @@ const getReportes = (req, res) => {
 
   const query = 'SELECT * FROM reportes';
 
-  // imagenes
-  const streamifier = require('streamifier');
-  const cloudinary = require('../config/cloudinary');
-
 
   db.getConnection((err, connection) => {
     if (err) {
@@ -76,6 +72,8 @@ const getReportes = (req, res) => {
     });
   });
 };
+
+const streamifier = require('streamifier');
 
 const crearReporte = async (req, res) => {
   const { descripcion, lat, lng, ciudad, fechaHora, enviado, categoria } = req.body;
@@ -189,6 +187,9 @@ const getReportePorId = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener el reporte', detalle: err.message });
   }
 };
+
+// imagenes
+const cloudinary = require('../config/cloudinary');
 
 const eliminarReporte = async (req, res) => {
   const { id } = req.params;

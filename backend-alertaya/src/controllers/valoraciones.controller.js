@@ -58,9 +58,6 @@ const valorarReporte = (req, res) => {
   });
 };
 
-
-
-
 // obtener valoracion de usuario 
 const obtenerValoracionUsuario = (req, res) => {
   const userEmail = req.user?.email;  // Email en lugar de id

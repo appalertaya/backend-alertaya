@@ -177,16 +177,28 @@ const getReportePorId = async (req, res) => {
       'SELECT url_imagen FROM ImagenesReporte WHERE id_reporte = ?',
       [id]
     );
-
-    // Adjuntar arreglo de URLs al reporte
     reporte.imagenes = imagenes.map((img) => img.url_imagen);
+
+    // Obtener conteo de valoraciones
+    const [valoraciones] = await db.promise().query(
+      `SELECT
+        SUM(CASE WHEN utilidad = 'util' THEN 1 ELSE 0 END) AS utiles,
+        SUM(CASE WHEN utilidad = 'no_util' THEN 1 ELSE 0 END) AS no_utiles
+      FROM valoraciones
+      WHERE reporte_id = ?`,
+      [id]
+    );
+
+    reporte.valoraciones_utiles = valoraciones[0].utiles || 0;
+    reporte.valoraciones_no_utiles = valoraciones[0].no_utiles || 0;
 
     res.json(reporte);
   } catch (err) {
-    console.error('Error al obtener reporte con imágenes:', err);
+    console.error('Error al obtener reporte con imágenes y valoraciones:', err);
     res.status(500).json({ error: 'Error al obtener el reporte', detalle: err.message });
   }
 };
+
 
 // imagenes
 const cloudinary = require('../config/cloudinary');

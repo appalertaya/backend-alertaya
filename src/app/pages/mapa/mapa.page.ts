@@ -162,6 +162,12 @@ export class MapaPage implements AfterViewInit {
     return R * c;
   }
 
+  reiniciarFiltros() {
+    this.categoriasSeleccionadas = [];
+    this.radioKmSeleccionado = 2;
+    this.cargarReportes();
+  }
+
   private marcadorReporteMap = new Map<string, number>(); // marcadorId -> reporteId
 
   async abrirModalDetalle(reporte: Reporte) {
@@ -196,19 +202,30 @@ export class MapaPage implements AfterViewInit {
     // Agregar marcadores de reportes
     for (const rep of reportes) {
       try {
+        console.log("rep: ", rep)
+        let confiabilidad: 'confiable' | 'no_confiable' | undefined = undefined;
+
+        if (rep.valoraciones_utiles > 1 && rep.valoraciones_utiles > rep.valoraciones_no_utiles) {
+          confiabilidad = 'confiable';
+        } else if (rep.valoraciones_no_utiles >= rep.valoraciones_utiles && rep.valoraciones_no_utiles >= 1) {
+          confiabilidad = 'no_confiable';
+        }
+
+        const iconUrl = this.getIconoPorCategoria(rep.categoria, confiabilidad);
+
         const markerId = await this.newMap?.addMarker({
           coordinate: {
             lat: parseFloat(rep.lat),
             lng: parseFloat(rep.lng),
           },
-          iconUrl: this.getIconoPorCategoria(rep.categoria),
+          iconUrl,
           iconSize: { width: 32, height: 32 },
-          zIndex: 2 // marcador arriba
+          zIndex: 2
         });
 
         if (markerId) {
           this.marcadores.push(markerId);
-          this.marcadorReporteMap.set(markerId, rep); // Asocia el objeto completo
+          this.marcadorReporteMap.set(markerId, rep);
         }
       } catch (err) {
         console.warn('Error al agregar marcador:', err);
@@ -231,34 +248,40 @@ export class MapaPage implements AfterViewInit {
     });
   }
 
+  getIconoPorCategoria(categoria: string, confiabilidad?: 'confiable' | 'no_confiable'): string {
+    let base = '';
 
-
-
-  reiniciarFiltros() {
-    this.categoriasSeleccionadas = [];
-    this.radioKmSeleccionado = 2;
-    this.cargarReportes();
-  }
-
-  getIconoPorCategoria(categoria: string): string {
     switch (categoria.toLowerCase()) {
       case 'corte de luz':
-        return 'assets/iconos/logoLuz.png';
+        base = 'logoLuz';
+        break;
       case 'corte de agua':
-        return 'assets/iconos/logoAgua.png';
+        base = 'logoAgua';
+        break;
       case 'semáforo en mal estado':
-        return 'assets/iconos/logoSemaforo.png';
+        base = 'logoSemaforo';
+        break;
       case 'paradero dañado':
-        return 'assets/iconos/logoParadero.png';
+        base = 'logoParadero';
+        break;
       case 'alumbrado público':
-        return 'assets/iconos/logoAlumbrado.png';
+        base = 'logoAlumbrado';
+        break;
       case 'fuga o filtración':
-        return 'assets/iconos/logoFuga.png';
+        base = 'logoFuga';
+        break;
       case 'calzada o vereda rota':
-        return 'assets/iconos/logoCalzada.png';
+        base = 'logoCalzada';
+        break;
       default:
-        return 'assets/iconos/logoOtro.png';
+        base = 'logoOtro';
     }
+
+    // Añadir sufijo de confiabilidad si corresponde
+    if (confiabilidad === 'confiable') return `assets/iconos/${base}Confiable.png`;
+    if (confiabilidad === 'no_confiable') return `assets/iconos/${base}NoConfiable.png`;
+
+    return `assets/iconos/${base}.png`;
   }
 
   async abrirModalGraficoCategorias() {

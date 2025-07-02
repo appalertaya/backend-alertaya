@@ -14,8 +14,11 @@ export interface Reporte {
   fechaHora: string;
   enviado: boolean;
   categoria: string;
-  imagenUrl?: string;
+  imagenes?: string;
   creadorEmail?: string;
+  valoraciones_utiles?: number;
+  valoraciones_no_utiles?: number;
+  
 }
 
 @Injectable({

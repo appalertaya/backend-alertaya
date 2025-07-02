@@ -17,6 +17,20 @@
           <ion-card-subtitle>{{ fechaFormateada }} - {{ reporte.ciudad }}</ion-card-subtitle>
         </ion-text>
       </div>
+      <!-- Confiabilidad -->
+      <div *ngIf="estadoConfiabilidad" class="estado-confiabilidad" [ngClass]="estadoConfiabilidad">
+        <ion-icon [name]="estadoConfiabilidad === 'confiable' ? 'star' : 'alert-circle'" slot="start"></ion-icon>
+        {{ estadoConfiabilidad === 'confiable' ? 'Reporte confiable' : 'Reporte no confiable' }}
+      </div>
+      <!-- Estadísticas de valoración -->
+      <ion-text color="medium"
+        *ngIf="reporte.valoraciones_utiles !== undefined && reporte.valoraciones_no_utiles !== undefined">
+        <p class="estadisticas-votos">
+          👍 Útiles: {{ reporte.valoraciones_utiles }} &nbsp; | &nbsp;
+          👎 No útiles: {{ reporte.valoraciones_no_utiles }}
+        </p>
+      </ion-text>
+
       <ion-card-title>{{ reporte.categoria }}</ion-card-title>
     </ion-card-header>
 

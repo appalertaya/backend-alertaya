@@ -4,7 +4,7 @@ const db = require('../config/db');
 const valorarReporte = (req, res) => {
   const usuarioEmail = req.user?.email;
   const reporteId = req.params.id;
-  const { utilidad } = req.body; // tiene que venir como 'util' o 'no_util'
+  const { utilidad } = req.body; // debe ser 'util' o 'no_util'
 
   if (!usuarioEmail || !reporteId || !['util', 'no_util', null].includes(utilidad)) {
     return res.status(400).json({ error: 'Datos inválidos' });
@@ -12,30 +12,34 @@ const valorarReporte = (req, res) => {
 
   const fecha = new Date();
 
-  const sql = `
+  const sqlInsert = `
     INSERT INTO valoraciones (reporte_id, usuario_email, utilidad, fecha)
     VALUES (?, ?, ?, ?)
     ON DUPLICATE KEY UPDATE utilidad = VALUES(utilidad), fecha = VALUES(fecha)
   `;
 
-  db.query(sql, [reporteId, usuarioEmail, utilidad, fecha], (err) => {
+  db.query(sqlInsert, [reporteId, usuarioEmail, utilidad, fecha], (err) => {
     if (err) return res.status(500).json({ error: 'Error al registrar valoración' });
 
-    // Verificar cantidad de valoraciones positivas
-    const sqlCount = `
-      SELECT COUNT(*) AS utiles
+    // Contar tanto útiles como no útiles
+    const sqlContarAmbos = `
+      SELECT
+        SUM(utilidad = 'util') AS utiles,
+        SUM(utilidad = 'no_util') AS no_utiles
       FROM valoraciones
-      WHERE reporte_id = ? AND utilidad = 'util'
+      WHERE reporte_id = ?
     `;
 
-    db.query(sqlCount, [reporteId], (err2, results) => {
+    db.query(sqlContarAmbos, [reporteId], (err2, resultados) => {
       if (err2) return res.status(500).json({ error: 'Valor registrada, pero error al contar votos' });
 
-      const utiles = results[0].utiles;
-      const umbral = 3;
+      const utiles = Number(resultados[0].utiles || 0);
+      const noUtiles = Number(resultados[0].no_utiles || 0);
+      const umbral = 1;
 
-      // Si cumple con el umbral, marcar como confiable
-      const esConfiable = utiles >= umbral ? 1 : 0;
+      // Solo es confiable si hay al menos 3 útiles y más que los no útiles
+      const esConfiable = utiles >= umbral && utiles > noUtiles ? 1 : 0;
+
       const sqlUpdate = `UPDATE reportes SET esConfiable = ? WHERE id = ?`;
 
       db.query(sqlUpdate, [esConfiable, reporteId], (err3) => {
@@ -43,11 +47,17 @@ const valorarReporte = (req, res) => {
           return res.status(500).json({ error: 'Valor registrada, pero error al actualizar confiabilidad' });
         }
 
-        return res.status(200).json({ mensaje: 'Valoración registrada', confiable: esConfiable === 1 });
+        return res.status(200).json({
+          mensaje: 'Valoración registrada',
+          confiable: esConfiable === 1,
+          utiles,
+          noUtiles
+        });
       });
     });
   });
 };
+
 
 
 

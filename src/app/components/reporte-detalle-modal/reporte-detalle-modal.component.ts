@@ -16,6 +16,7 @@ export class ReporteDetalleModalComponent {
   mostrarCoords: boolean = false;
   fechaFormateada: string = '';
   imagenes: string[] = [];
+  estadoConfiabilidad: 'confiable' | 'no_confiable' | null = null;
 
   constructor(
     private modalCtrl: ModalController,
@@ -56,6 +57,17 @@ export class ReporteDetalleModalComponent {
 
     } catch (err) {
       console.warn('Error al obtener valoración previa:', err);
+    }
+    // Evaluar confiabilidad
+    const utiles = (detalle as any).valoraciones_utiles || 0;
+    const noUtiles = (detalle as any).valoraciones_no_utiles || 0;
+
+    if (utiles >= 1 && utiles > noUtiles) {
+      this.estadoConfiabilidad = 'confiable';
+    } else if (noUtiles >= 1 && noUtiles > utiles) {
+      this.estadoConfiabilidad = 'no_confiable';
+    } else {
+      this.estadoConfiabilidad = null;
     }
   }
 

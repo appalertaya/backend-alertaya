@@ -21,6 +21,7 @@ export class ReportePage {
   cargando: boolean = true;
   categoriaSeleccionada: string = '';
   imagenes: File[] = [];
+  enviar: boolean = false;
 
   constructor(
     private geoService: GeolocationService,
@@ -112,23 +113,26 @@ export class ReportePage {
       return;
     }
 
-    const ciudad = await this.geoService.obtenerCiudad(ubicacionActual.lat, ubicacionActual.lon);
-    const fechaHora = new Date().toISOString().split('.')[0];
-
-    const formData = new FormData();
-    formData.append('descripcion', this.descripcion);
-    formData.append('lat', String(ubicacionActual.lat));
-    formData.append('lng', String(ubicacionActual.lon));
-    formData.append('ciudad', ciudad || 'Desconocida');
-    formData.append('fechaHora', fechaHora);
-    formData.append('enviado', 'true');
-    formData.append('categoria', this.categoriaSeleccionada);
-
-    this.imagenes.forEach((img, index) => {
-      formData.append('imagenes', img);
-    });
-
     try {
+
+      this.enviar = true;
+
+      const ciudad = await this.geoService.obtenerCiudad(ubicacionActual.lat, ubicacionActual.lon);
+      const fechaHora = new Date().toISOString().split('.')[0];
+
+      const formData = new FormData();
+      formData.append('descripcion', this.descripcion);
+      formData.append('lat', String(ubicacionActual.lat));
+      formData.append('lng', String(ubicacionActual.lon));
+      formData.append('ciudad', ciudad || 'Desconocida');
+      formData.append('fechaHora', fechaHora);
+      formData.append('enviado', 'true');
+      formData.append('categoria', this.categoriaSeleccionada);
+
+      this.imagenes.forEach((img, index) => {
+        formData.append('imagenes', img);
+      });
+
       await this.reporteService.guardarReporte(formData);
       this.mostrarMensaje('Reporte enviado con éxito', 'success');
       this.descripcion = '';
@@ -136,6 +140,8 @@ export class ReportePage {
       this.imagenes = [];
     } catch (err) {
       this.mostrarMensaje('Ocurrió un error inesperado', 'danger');
+    } finally {
+      this.enviar = false;
     }
   }
 

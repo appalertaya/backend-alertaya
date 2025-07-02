@@ -10,7 +10,10 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-card *ngIf="reporte" class="detalle-reporte-card">
+
+  <ion-spinner name="crescent" *ngIf="cargando" style="display: block; margin: 2rem auto;"></ion-spinner>
+
+  <ion-card *ngIf="reporte && !cargando" class="detalle-reporte-card">
     <ion-card-header>
       <div class="detalle-fecha-ciudad">
         <ion-text color="medium">

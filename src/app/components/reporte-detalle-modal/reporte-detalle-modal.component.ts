@@ -17,6 +17,7 @@ export class ReporteDetalleModalComponent {
   fechaFormateada: string = '';
   imagenes: string[] = [];
   estadoConfiabilidad: 'confiable' | 'no_confiable' | null = null;
+  cargando: boolean = true;
 
   constructor(
     private modalCtrl: ModalController,
@@ -25,51 +26,60 @@ export class ReporteDetalleModalComponent {
   ) { }
 
   async ngOnInit() {
-    // viene reporte
-    if (!this.reporte?.id) return;
 
-    // detalle
-    const detalle = await this.reporteService.getReportePorId(this.reporte.id);
-    if (!detalle) return;
-
-    // fecha
-    if (this.reporte?.fechaHora) {
-      const fecha = new Date(this.reporte.fechaHora);
-      this.reporte = detalle;
-      this.fechaFormateada = fecha.toISOString().split('T')[0]; // "2025-06-28"
-    }
-
-    // latitud y longitud
-    if (this.reporte?.lat) this.reporte.lat = Number(this.reporte.lat);
-    if (this.reporte?.lng) this.reporte.lng = Number(this.reporte.lng);
-
-    // imagenes
-    this.imagenes = Array.isArray((detalle as any).imagenes) ? (detalle as any).imagenes : [];
-    console.log("Detalle con imágenes:", this.reporte);
-    console.log("this.imagenes:", this.imagenes);
-
+    this.cargando = true;
+    
     try {
-      const response = await (
-        await this.valoracionService.obtenerValoracionUsuario(this.reporte.id!)
-      ).toPromise();
+      if (!this.reporte?.id) return;
 
-      this.valoracion = response?.valorado ? response.util : null;
+      // Obtener el detalle completo desde el backend
+      const detalle = await this.reporteService.getReportePorId(this.reporte.id);
+      if (!detalle) return;
 
-    } catch (err) {
-      console.warn('Error al obtener valoración previa:', err);
-    }
-    // Evaluar confiabilidad
-    const utiles = (detalle as any).valoraciones_utiles || 0;
-    const noUtiles = (detalle as any).valoraciones_no_utiles || 0;
+      this.reporte = detalle;
 
-    if (utiles >= 1 && utiles > noUtiles) {
-      this.estadoConfiabilidad = 'confiable';
-    } else if (noUtiles >= 1 && noUtiles > utiles) {
-      this.estadoConfiabilidad = 'no_confiable';
-    } else {
-      this.estadoConfiabilidad = null;
+      // Fecha formateada
+      if (this.reporte?.fechaHora) {
+        const fecha = new Date(this.reporte.fechaHora);
+        this.fechaFormateada = fecha.toISOString().split('T')[0];
+      }
+
+      // Coordenadas numéricas
+      if (this.reporte?.lat) this.reporte.lat = Number(this.reporte.lat);
+      if (this.reporte?.lng) this.reporte.lng = Number(this.reporte.lng);
+
+      // Imágenes asociadas
+      this.imagenes = Array.isArray((detalle as any).imagenes) ? (detalle as any).imagenes : [];
+
+      // Estado de confiabilidad directo desde el backend
+      if (detalle.esConfiable === 1) {
+        this.estadoConfiabilidad = 'confiable';
+      } else if (
+        (detalle as any).valoraciones_no_utiles >= 1 &&
+        (detalle as any).valoraciones_no_utiles >= (detalle as any).valoraciones_utiles
+      ) {
+        this.estadoConfiabilidad = 'no_confiable';
+      } else {
+        this.estadoConfiabilidad = null;
+      }
+
+      // Obtener la valoración del usuario (si existe)
+      try {
+        const response = await (
+          await this.valoracionService.obtenerValoracionUsuario(this.reporte.id!)
+        ).toPromise();
+
+        this.valoracion = response?.valorado ? response.util : null;
+      } catch (err) {
+        console.warn('Error al obtener valoración previa:', err);
+      }
+    } catch (e) {
+      console.warn('Error cargando detalle del reporte');
+    } finally {
+      this.cargando = false;
     }
   }
+
 
   cerrarModal() {
     this.modalCtrl.dismiss();

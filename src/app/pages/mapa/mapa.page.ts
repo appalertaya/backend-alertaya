@@ -202,12 +202,11 @@ export class MapaPage implements AfterViewInit {
     // Agregar marcadores de reportes
     for (const rep of reportes) {
       try {
-        console.log("rep: ", rep)
         let confiabilidad: 'confiable' | 'no_confiable' | undefined = undefined;
 
-        if (rep.valoraciones_utiles > 1 && rep.valoraciones_utiles > rep.valoraciones_no_utiles) {
+        if (rep.esConfiable === 1) {
           confiabilidad = 'confiable';
-        } else if (rep.valoraciones_no_utiles >= rep.valoraciones_utiles && rep.valoraciones_no_utiles >= 1) {
+        } else if (rep.esConfiable === 0) {
           confiabilidad = 'no_confiable';
         }
 
@@ -232,6 +231,7 @@ export class MapaPage implements AfterViewInit {
       }
     }
 
+
     // Registrar listener para clics en marcadores
     this.newMap?.setOnMarkerClickListener(async (data) => {
       const reporte = this.marcadorReporteMap.get(data.markerId);
@@ -252,37 +252,21 @@ export class MapaPage implements AfterViewInit {
     let base = '';
 
     switch (categoria.toLowerCase()) {
-      case 'corte de luz':
-        base = 'logoLuz';
-        break;
-      case 'corte de agua':
-        base = 'logoAgua';
-        break;
-      case 'semáforo en mal estado':
-        base = 'logoSemaforo';
-        break;
-      case 'paradero dañado':
-        base = 'logoParadero';
-        break;
-      case 'alumbrado público':
-        base = 'logoAlumbrado';
-        break;
-      case 'fuga o filtración':
-        base = 'logoFuga';
-        break;
-      case 'calzada o vereda rota':
-        base = 'logoCalzada';
-        break;
-      default:
-        base = 'logoOtro';
+      case 'corte de luz': base = 'logoLuz'; break;
+      case 'corte de agua': base = 'logoAgua'; break;
+      case 'semáforo en mal estado': base = 'logoSemaforo'; break;
+      case 'paradero dañado': base = 'logoParadero'; break;
+      case 'alumbrado público': base = 'logoAlumbrado'; break;
+      case 'fuga o filtración': base = 'logoFuga'; break;
+      case 'calzada o vereda rota': base = 'logoCalzada'; break;
+      default: base = 'logoOtro';
     }
 
-    // Añadir sufijo de confiabilidad si corresponde
     if (confiabilidad === 'confiable') return `assets/iconos/${base}Confiable.png`;
     if (confiabilidad === 'no_confiable') return `assets/iconos/${base}NoConfiable.png`;
-
     return `assets/iconos/${base}.png`;
   }
+
 
   async abrirModalGraficoCategorias() {
     const modal = await this.modalController.create({

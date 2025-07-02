@@ -16,10 +16,8 @@ export class HistorialPage implements OnInit {
   error: string = '';
   conexionLista: boolean = false;
   cargando: boolean = true;
-
   pendientesLocales: Reporte[] = [];
   apiFallo: boolean = false;
-
 
   categorias: string[] = [
     'Corte de luz',
@@ -88,25 +86,29 @@ export class HistorialPage implements OnInit {
 
   // Eliminar reportes del backend 
   async eliminarReporte(reporte: Reporte) {
-    const alert = await this.alertController.create({
-      header: 'Eliminar reporte',
-      message: '¿Estás seguro de que deseas eliminar este reporte?',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          handler: async () => {
-            try {
-              await this.reporteService.eliminarReporteBackend(reporte.id!);
-              this.cargarReportes();
-            } catch (err) {
-              console.warn('Error al eliminar reporte del backend:', err);
+    try {
+      const alert = await this.alertController.create({
+        header: 'Eliminar reporte',
+        message: '¿Estás seguro de que deseas eliminar este reporte?',
+        buttons: [
+          { text: 'Cancelar', role: 'cancel' },
+          {
+            text: 'Eliminar',
+            handler: async () => {
+              try {
+                await this.reporteService.eliminarReporteBackend(reporte.id!);
+                this.cargarReportes();
+              } catch (err) {
+                console.warn('Error al eliminar reporte del backend:', err);
+              }
             }
           }
-        }
-      ]
-    });
-    await alert.present();
+        ]
+      });
+      await alert.present();
+    } catch (error) {
+      this.mostrarMensaje('Ocurrió un error inesperado', 'danger');
+    }
   }
   async mostrarMensaje(mensaje: string, color: string) {
     const toast = await this.toastController.create({

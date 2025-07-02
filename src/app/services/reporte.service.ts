@@ -16,9 +16,9 @@ export interface Reporte {
   categoria: string;
   imagenes?: string;
   creadorEmail?: string;
+  esConfiable?: number;
   valoraciones_utiles?: number;
   valoraciones_no_utiles?: number;
-  
 }
 
 @Injectable({

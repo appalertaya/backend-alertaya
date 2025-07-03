@@ -1,3 +1,4 @@
+import enviarNotificacionesUsuariosCercanos from '../utils/sendNotification';
 
 const db = require('../config/db');
 
@@ -97,10 +98,18 @@ const crearReporte = async (req, res) => {
       INSERT INTO reportes (descripcion, lat, lng, ciudad, fechaHora, enviado, categoria, usuarioId)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    const valores = [descripcion, lat, lng, ciudad, fechaHora, enviado !== undefined ? (enviado ? 1 : 0) : 1, categoria, usuarioId];
+    const valores = [
+      descripcion,
+      lat,
+      lng,
+      ciudad,
+      fechaHora,
+      enviado !== undefined ? (enviado ? 1 : 0) : 1,
+      categoria,
+      usuarioId
+    ];
     const [resultado] = await db.promise().query(sqlReporte, valores);
     const idReporte = resultado.insertId;
-
 
     // Subir imágenes a Cloudinary y registrar en la BD
     for (const file of req.files) {
@@ -126,46 +135,17 @@ const crearReporte = async (req, res) => {
       ]);
     }
 
-    //para notificaciones a usuarios cercanos a 10km
+    // Enviar notificaciones a usuarios cercanos
     try {
-      // Obtener la ubicación del nuevo reporte
-      const puntoReporte = { latitude: parseFloat(lat), longitude: parseFloat(lng) };
-
-      // Buscar usuarios con token y ubicación registrados
       const [usuarios] = await db.promise().query(`
-    SELECT tokenFCM, lat, lng FROM usuarios
-    WHERE tokenFCM IS NOT NULL AND lat IS NOT NULL AND lng IS NOT NULL
-  `);
+        SELECT tokenFCM, lat, lng FROM usuarios
+        WHERE tokenFCM IS NOT NULL AND lat IS NOT NULL AND lng IS NOT NULL
+      `);
 
-      // Filtrar por distancia menor a 10km
-      const usuariosCercanos = usuarios.filter(usuario => {
-        const puntoUsuario = {
-          latitude: parseFloat(usuario.lat),
-          longitude: parseFloat(usuario.lng),
-        };
-        const distancia = haversine(puntoReporte, puntoUsuario); // en metros
-        return distancia <= 10000; // máximo 10 km
-      });
-
-      console.log(`Usuarios dentro de 10 km: ${usuariosCercanos.length}`);
-
-      for (const usuario of usuariosCercanos) {
-        const message = {
-          notification: {
-            title: `Nuevo reporte cercano: ${categoria}`,
-            body: `Se registró un incidente en tu zona (${ciudad}).`,
-          },
-          token: usuario.tokenFCM,
-        };
-
-        try {
-          await admin.messaging().send(message);
-          console.log(`Notificación enviada a: ${usuario.tokenFCM}`);
-        } catch (err) {
-          console.warn(`Error al enviar notificación: ${err.message}`);
-        }
-      }
-
+      await enviarNotificacionesUsuariosCercanos(
+        { lat, lng, ciudad, categoria },
+        usuarios
+      );
     } catch (errorNoti) {
       console.warn('Error durante envío de notificaciones:', errorNoti.message || errorNoti);
     }
@@ -176,6 +156,7 @@ const crearReporte = async (req, res) => {
     res.status(500).json({ error: 'Error al crear el reporte', detalle: err.message || err });
   }
 };
+
 
 
 const getMisReportes = (req, res) => {

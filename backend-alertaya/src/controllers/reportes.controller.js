@@ -138,7 +138,7 @@ const crearReporte = async (req, res) => {
     // Enviar notificaciones a usuarios cercanos
     try {
       const [usuarios] = await db.promise().query(`
-        SELECT tokenFCM, lat, lng FROM usuarios
+        SELECT tokenFCM, ultimaLat, ultimaLng FROM usuarios
         WHERE tokenFCM IS NOT NULL AND lat IS NOT NULL AND lng IS NOT NULL
       `);
 

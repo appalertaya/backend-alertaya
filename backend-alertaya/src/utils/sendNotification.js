@@ -7,7 +7,7 @@ const haversine = require('haversine-distance');
  * @param {Array} usuarios - Usuarios con tokenFCM y ubicación registrada.
  */
 async function enviarNotificacionesUsuariosCercanos(datosReporte, usuarios) {
-    console.log("datosReporte: ",datosReporte)
+    console.log("datosReporte: ", datosReporte)
     const { lat, lng, ciudad, categoria } = datosReporte;
     const puntoReporte = { latitude: parseFloat(lat), longitude: parseFloat(lng) };
 
@@ -29,6 +29,9 @@ async function enviarNotificacionesUsuariosCercanos(datosReporte, usuarios) {
                 body: `Se registró un incidente en tu zona (${ciudad}).`,
             },
             token: usuario.tokenFCM,
+            android: {
+                priority: 'high'  // Esto mejora la entrega inmediata
+            }
         };
 
         try {

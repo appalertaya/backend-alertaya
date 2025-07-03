@@ -62,8 +62,6 @@ export class ReportePage {
           lat: ubicacion.lat,
           lng: ubicacion.lon
         };
-        console.log('Ciudad:', ubicacion.ciudad);
-        console.log('Hora:', ubicacion.fechaHora);
         this.gpsListo = true;
         // await this.notificacionesService.registrarNotificaciones(this.ubicacion);
         await this.pushService.initPush(this.ubicacion);

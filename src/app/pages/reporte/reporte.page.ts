@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { GeolocationService } from 'src/app/services/geolocalizacion.service';
 import { PermisosGPSInternetService } from 'src/app/services/permisos.service';
 import { ToastController } from '@ionic/angular';
-import { ReporteService, Reporte } from 'src/app/services/reporte.service';
-import { ImagenPreviewPipe } from 'src/app/pipes/imagen-preview.pipe';
+import { ReporteService } from 'src/app/services/reporte.service';
+import { NotificacionesService } from 'src/app/services/notificaciones.service';
 
 @Component({
   selector: 'app-reporte',
@@ -27,7 +27,8 @@ export class ReportePage {
     private geoService: GeolocationService,
     private permisosService: PermisosGPSInternetService,
     private toastController: ToastController,
-    private reporteService: ReporteService
+    private reporteService: ReporteService,
+    private notificacionesService: NotificacionesService
   ) { }
 
   async ngOnInit() {
@@ -62,6 +63,8 @@ export class ReportePage {
         console.log('Ciudad:', ubicacion.ciudad);
         console.log('Hora:', ubicacion.fechaHora);
         this.gpsListo = true;
+        await this.notificacionesService.registrarNotificaciones(this.ubicacion);
+
       } else {
         this.error = 'No se pudo obtener la ubicación.';
       }

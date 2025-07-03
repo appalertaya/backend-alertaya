@@ -1,14 +1,23 @@
 import { Injectable } from '@angular/core';
-import { PushNotifications, Token, ActionPerformed, PushNotificationSchema } from '@capacitor/push-notifications';
+import {
+  PushNotifications,
+  Token,
+  ActionPerformed,
+  PushNotificationSchema
+} from '@capacitor/push-notifications';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Preferences } from '@capacitor/preferences';
+
+const BACKEND_URL = 'https://backend-alertaya.onrender.com';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PushNotificationService {
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
-  async initPush() {
+  async initPush(ubicacion: { lat: number; lng: number }) {
     const permission = await PushNotifications.requestPermissions();
 
     if (permission.receive !== 'granted') {
@@ -16,26 +25,40 @@ export class PushNotificationService {
       return;
     }
 
-    PushNotifications.register();
+    await PushNotifications.register();
 
-    // Registro exitoso, obtienes el token
-    PushNotifications.addListener('registration', (token: Token) => {
+    // Se dispara solo una vez
+    PushNotifications.addListener('registration', async (token: Token) => {
       console.log('Token de dispositivo:', token.value);
-      // Aquí podrías enviar el token a tu backend si deseas enviarle notificaciones específicas
+
+      try {
+        const { value: jwt } = await Preferences.get({ key: 'token' });
+
+        const headers = new HttpHeaders({
+          Authorization: `Bearer ${jwt}`,
+        });
+
+        await this.http.put(`${BACKEND_URL}/api/usuarios/token`, {
+          tokenFCM: token.value,
+          lat: ubicacion.lat,
+          lng: ubicacion.lng
+        }, { headers }).toPromise();
+        
+        console.log('Token y ubicación enviados al backend');
+
+      } catch (error) {
+        console.error('Error al enviar token al backend:', error);
+      }
     });
 
-    // Error al registrar
     PushNotifications.addListener('registrationError', (error) => {
       console.error('Error de registro:', error);
     });
 
-    // Notificación recibida en primer plano
     PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
       console.log('Notificación recibida:', notification);
-      // Puedes mostrar un toast o alerta aquí si lo deseas
     });
 
-    // Acción realizada al tocar la notificación
     PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
       console.log('Notificación pulsada:', notification.notification);
     });

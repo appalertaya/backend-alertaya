@@ -3,7 +3,10 @@ const db = require('../config/db');
 const actualizarTokenYUbicacion = (req, res) => {
     const email = req.user?.email;
     const { tokenFCM, lat, lng } = req.body;
-
+    console.log("email: ",email)
+    console.log("tokenFCM: ",tokenFCM)
+    console.log("lat: ",lat)
+    console.log("lng: ",lng)
     if (!email || !tokenFCM) {
         return res.status(400).json({ error: 'Datos incompletos' });
     }

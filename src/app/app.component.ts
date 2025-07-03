@@ -25,7 +25,7 @@ export class AppComponent {
     await this.configService.loadConfig();
     environment.backendUrl = this.configService.backendUrl;
     console.log('URL final del backend:', environment.backendUrl);
-    this.pushService.initPush(); // Inicializar notificaciones
+    // this.pushService.initPush(); // Inicializar notificaciones
   }
 
   cerrarMenu() {

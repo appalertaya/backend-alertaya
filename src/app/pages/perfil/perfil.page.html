@@ -1,21 +1,22 @@
-<ion-header>
-    <ion-toolbar>
-        <ion-title>Mi Perfil</ion-title>
-    </ion-toolbar>
-</ion-header>
-
-<ion-content class="ion-padding">
-    <ion-item>
+<ion-content *ngIf="!cargando">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Mi Perfil</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
         <ion-label position="stacked">Nombre</ion-label>
         <ion-input [(ngModel)]="nombre"></ion-input>
-    </ion-item>
+      </ion-item>
 
-    <ion-item>
-        <ion-label position="stacked">Correo</ion-label>
-        <ion-input type="email" [(ngModel)]="correo"></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Correo electrónico</ion-label>
+        <ion-input [(ngModel)]="correo"></ion-input>
+      </ion-item>
 
-    <ion-button expand="full" (click)="guardarCambios()" class="ion-margin-top">
-        Guardar Cambios
-    </ion-button>
+      <ion-button expand="full" (click)="guardarCambios()">Guardar Cambios</ion-button>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
+
+<ion-spinner *ngIf="cargando" name="dots"></ion-spinner>

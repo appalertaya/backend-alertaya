@@ -28,6 +28,9 @@ export class PerfilPage implements OnInit {
             this.cargarPerfil();
         }
     }
+    async ionViewWillEnter() {
+        await this.cargarPerfil();
+    }
 
     async cargarPerfil() {
         const loading = await this.loadingCtrl.create({ message: 'Cargando perfil...' });

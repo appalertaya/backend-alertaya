@@ -12,8 +12,8 @@ async function enviarNotificacionesUsuariosCercanos(datosReporte, usuarios) {
 
   const usuariosCercanos = usuarios.filter(usuario => {
     const puntoUsuario = {
-      latitude: parseFloat(usuario.lat),
-      longitude: parseFloat(usuario.lng),
+      latitude: parseFloat(usuario.ultimaLat),
+      longitude: parseFloat(usuario.ultimaLng),
     };
     const distancia = haversine(puntoReporte, puntoUsuario); // metros
     return distancia <= 10000; // máximo 10 km

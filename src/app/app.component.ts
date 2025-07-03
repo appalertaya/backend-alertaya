@@ -4,6 +4,7 @@ import { ConfigService } from './services/config.service';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
+import { PushNotificationService } from './services/push-notification.service';
 
 @Component({
   selector: 'app-root',
@@ -16,13 +17,15 @@ export class AppComponent {
     private menu: MenuController,
     private configService: ConfigService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private pushService: PushNotificationService
   ) { }
 
   async ngOnInit() {
     await this.configService.loadConfig();
     environment.backendUrl = this.configService.backendUrl;
     console.log('URL final del backend:', environment.backendUrl);
+    this.pushService.initPush(); // Inicializar notificaciones
   }
 
   cerrarMenu() {

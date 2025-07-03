@@ -55,7 +55,7 @@ const actualizarPerfilUsuario = async (req, res) => {
 
     try {
         await db.promise().query(
-            'UPDATE usuarios SET nombre = ?, correo = ? WHERE id = ?',
+            'UPDATE usuarios SET nombre = ?, email = ? WHERE id = ?',
             [nombre, correo, usuarioId]
         );
         res.json({ mensaje: 'Perfil actualizado correctamente' });

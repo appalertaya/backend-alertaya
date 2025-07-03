@@ -17,6 +17,7 @@ app.use(express.json());
 app.use('/api/reportes', require('./routes/reportes'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/valoraciones', require('./routes/valoraciones'));
+app.use('/api/usuarios', require('./routes/usuarios'));
 
 // Ping
 app.get('/ping', (req, res) => {

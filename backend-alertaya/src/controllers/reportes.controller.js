@@ -1,4 +1,4 @@
-import enviarNotificacionesUsuariosCercanos from '../utils/sendNotification';
+const enviarNotificacionesUsuariosCercanos = require('../utils/sendNotification');
 
 const db = require('../config/db');
 

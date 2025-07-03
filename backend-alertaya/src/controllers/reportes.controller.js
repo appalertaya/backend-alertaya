@@ -74,6 +74,8 @@ const getReportes = (req, res) => {
 };
 
 const streamifier = require('streamifier');
+const admin = require('../config/firebase');
+const haversine = require('haversine-distance');
 
 const crearReporte = async (req, res) => {
   const { descripcion, lat, lng, ciudad, fechaHora, enviado, categoria } = req.body;
@@ -122,6 +124,50 @@ const crearReporte = async (req, res) => {
         resultadoCloudinary.secure_url,
         resultadoCloudinary.public_id
       ]);
+    }
+
+    //para notificaciones a usuarios cercanos a 10km
+    try {
+      // Obtener la ubicación del nuevo reporte
+      const puntoReporte = { latitude: parseFloat(lat), longitude: parseFloat(lng) };
+
+      // Buscar usuarios con token y ubicación registrados
+      const [usuarios] = await db.promise().query(`
+    SELECT tokenFCM, lat, lng FROM usuarios
+    WHERE tokenFCM IS NOT NULL AND lat IS NOT NULL AND lng IS NOT NULL
+  `);
+
+      // Filtrar por distancia menor a 10km
+      const usuariosCercanos = usuarios.filter(usuario => {
+        const puntoUsuario = {
+          latitude: parseFloat(usuario.lat),
+          longitude: parseFloat(usuario.lng),
+        };
+        const distancia = haversine(puntoReporte, puntoUsuario); // en metros
+        return distancia <= 10000; // máximo 10 km
+      });
+
+      console.log(`Usuarios dentro de 10 km: ${usuariosCercanos.length}`);
+
+      for (const usuario of usuariosCercanos) {
+        const message = {
+          notification: {
+            title: `Nuevo reporte cercano: ${categoria}`,
+            body: `Se registró un incidente en tu zona (${ciudad}).`,
+          },
+          token: usuario.tokenFCM,
+        };
+
+        try {
+          await admin.messaging().send(message);
+          console.log(`Notificación enviada a: ${usuario.tokenFCM}`);
+        } catch (err) {
+          console.warn(`Error al enviar notificación: ${err.message}`);
+        }
+      }
+
+    } catch (errorNoti) {
+      console.warn('Error durante envío de notificaciones:', errorNoti.message || errorNoti);
     }
 
     res.status(201).json({ mensaje: 'Reporte creado con imágenes', id: idReporte });

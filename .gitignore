@@ -70,4 +70,4 @@ testem.log
 Thumbs.db
 
 # firebase-service-account.json
-.backend-alertaya/firebase-service-account.json
+backend-alertaya/firebase-service-account.json

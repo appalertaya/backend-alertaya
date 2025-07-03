@@ -36,7 +36,7 @@ const getPerfilUsuario = async (req, res) => {
 
     try {
         const [rows] = await db.promise().query(
-            'SELECT nombre, correo FROM usuarios WHERE id = ?',
+            'SELECT nombre, email FROM usuarios WHERE id = ?',
             [usuarioId]
         );
         if (rows.length === 0) return res.status(404).json({ error: 'Usuario no encontrado' });

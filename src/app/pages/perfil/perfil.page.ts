@@ -6,6 +6,7 @@ import { AlertController, LoadingController, ToastController } from '@ionic/angu
 @Component({
     selector: 'app-perfil',
     templateUrl: './perfil.page.html',
+    standalone: false
 })
 export class PerfilPage implements OnInit {
     nombre: string = '';

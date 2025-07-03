@@ -1,6 +1,11 @@
 const admin = require('firebase-admin');
 
-const privateKey = process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n');
+// Reemplazo correcto de las secuencias \\n por saltos reales
+const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+console.log('🛠️ Verificando credenciales Firebase...');
+console.log('🔑 Clave privada (primeros 50 chars):', privateKey?.slice(0, 50));
+console.log('🔑 Clave privada (últimos 50 chars):', privateKey?.slice(-50));
 
 admin.initializeApp({
     credential: admin.credential.cert({

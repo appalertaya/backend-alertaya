@@ -1,0 +1,21 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>Mi Perfil</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+    <ion-item>
+        <ion-label position="stacked">Nombre</ion-label>
+        <ion-input [(ngModel)]="nombre"></ion-input>
+    </ion-item>
+
+    <ion-item>
+        <ion-label position="stacked">Correo</ion-label>
+        <ion-input type="email" [(ngModel)]="correo"></ion-input>
+    </ion-item>
+
+    <ion-button expand="full" (click)="guardarCambios()" class="ion-margin-top">
+        Guardar Cambios
+    </ion-button>
+</ion-content>

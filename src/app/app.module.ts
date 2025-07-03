@@ -15,6 +15,8 @@ import { CategoriasTablaModalComponent } from './components/categorias-tabla-mod
 
 import { TokenExpiradoInterceptor } from './interceptors/token-expirado.interceptor';
 
+import { IonicStorageModule } from '@ionic/storage-angular';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -26,7 +28,8 @@ import { TokenExpiradoInterceptor } from './interceptors/token-expirado.intercep
     IonicModule.forRoot(),
     AppRoutingModule,
     HttpClientModule,
-    GoogleMapsModule
+    GoogleMapsModule,
+    IonicStorageModule.forRoot()  // <-- Esto inicializa el Storage
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

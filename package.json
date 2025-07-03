@@ -39,6 +39,7 @@
     "@capacitor/splash-screen": "^5.0.8",
     "@capacitor/status-bar": "^5.0.8",
     "@ionic/angular": "^8.0.0",
+    "@ionic/storage-angular": "^4.0.0",
     "ionicons": "^7.0.0",
     "nodemailer": "^7.0.3",
     "rxjs": "~7.8.0",

@@ -1,20 +1,25 @@
-
 const admin = require('../config/firebase');
 const haversine = require('haversine-distance');
 
-async function enviarNotificacionesUsuariosCercanos({ lat, lng, ciudad, categoria }, usuarios) {
+/**
+ * Envía notificaciones a los usuarios ubicados dentro de un radio de 10 km.
+ * @param {Object} datosReporte - Contiene lat, lng, ciudad, categoria.
+ * @param {Array} usuarios - Usuarios con tokenFCM y ubicación registrada.
+ */
+async function enviarNotificacionesUsuariosCercanos(datosReporte, usuarios) {
+  const { lat, lng, ciudad, categoria } = datosReporte;
   const puntoReporte = { latitude: parseFloat(lat), longitude: parseFloat(lng) };
 
-  const usuariosCercanos = usuarios.filter((usuario) => {
+  const usuariosCercanos = usuarios.filter(usuario => {
     const puntoUsuario = {
       latitude: parseFloat(usuario.lat),
       longitude: parseFloat(usuario.lng),
     };
-    const distancia = haversine(puntoReporte, puntoUsuario);
-    return distancia <= 10000; // 10 km
+    const distancia = haversine(puntoReporte, puntoUsuario); // metros
+    return distancia <= 10000; // máximo 10 km
   });
 
-  console.log(`➡️ Usuarios dentro de 10 km: ${usuariosCercanos.length}`);
+  console.log(`Usuarios dentro de 10 km: ${usuariosCercanos.length}`);
 
   for (const usuario of usuariosCercanos) {
     const message = {

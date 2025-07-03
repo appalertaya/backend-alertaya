@@ -67,7 +67,7 @@ export class ReportePage {
         this.gpsListo = true;
         // await this.notificacionesService.registrarNotificaciones(this.ubicacion);
         await this.pushService.initPush(this.ubicacion);
-        
+
       } else {
         this.error = 'No se pudo obtener la ubicación.';
       }
@@ -77,6 +77,10 @@ export class ReportePage {
     } finally {
       this.cargando = false;
     }
+  }
+
+  ionViewWillEnter() {
+    this.ngOnInit(); // Fuerza re-ejecutar toda la lógica cada vez que entras
   }
 
   // Generador de URL segura para iframe

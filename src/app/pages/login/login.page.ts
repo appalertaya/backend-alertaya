@@ -38,7 +38,6 @@ export class LoginPage {
       }
     });
     const { value } = await Preferences.get({ key: 'email' });
-    console.log('📩 Email almacenado:', value);
 
   }
 

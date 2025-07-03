@@ -139,7 +139,7 @@ const crearReporte = async (req, res) => {
     try {
       const [usuarios] = await db.promise().query(`
         SELECT tokenFCM, ultimaLat, ultimaLng FROM usuarios
-        WHERE tokenFCM IS NOT NULL AND lat IS NOT NULL AND lng IS NOT NULL
+        WHERE tokenFCM IS NOT NULL AND ultimaLat IS NOT NULL AND ultimaLng IS NOT NULL
       `);
 
       await enviarNotificacionesUsuariosCercanos(

@@ -1,7 +1,55 @@
-ion-content,
 html,
 body,
-ion-app {
-  --background: var(--ion-background-color, #ffffff) !important;
-  background: var(--ion-background-color, #ffffff) !important;
+ion-content {
+  --background: var(--ion-background-color, #121212) !important;
+  background: var(--ion-background-color, #121212) !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+form {
+  width: 100%;
+  max-width: 400px;
+  background: #1e1e1e;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+ion-item {
+  --background: #2a2a2a;
+  --highlight-color-focused: #3880ff;
+  margin-top: 16px;
+  border-radius: 12px;
+  color: #ffffff;
+}
+
+ion-label {
+  color: #ccc;
+}
+
+ion-input {
+  color: #fff;
+}
+
+ion-button[type='submit'] {
+  --background: #3880ff;
+  --border-radius: 12px;
+  font-weight: bold;
+  margin-top: 24px;
+}
+
+ion-text {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  color: #aaa;
+}
+
+ion-button[fill='clear'] {
+  color: #3880ff;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.9rem;
 }

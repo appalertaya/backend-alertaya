@@ -12,6 +12,7 @@ export class CategoriasTablaModalComponent {
 
   datos: { categoria: string; cantidad: number }[] = [];
   cargando = true;
+  totalReportes = 0;
 
   constructor(
     private modalCtrl: ModalController,
@@ -22,6 +23,7 @@ export class CategoriasTablaModalComponent {
     this.reporteService.getCantidadPorCategoria().subscribe({
       next: (res) => {
         this.datos = res;
+        this.totalReportes = res.reduce((acc, curr) => acc + curr.cantidad, 0);
         this.cargando = false;
       },
       error: (err) => {
@@ -29,6 +31,10 @@ export class CategoriasTablaModalComponent {
         this.cargando = false;
       }
     });
+  }
+
+  calcularPorcentaje(cantidad: number): string {
+    return this.totalReportes > 0 ? ((cantidad / this.totalReportes) * 100).toFixed(1) + '%' : '';
   }
 
   cerrar() {

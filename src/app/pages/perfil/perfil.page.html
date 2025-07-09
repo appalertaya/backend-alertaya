@@ -1,21 +1,35 @@
-<ion-content>
-  <ion-card>
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Mi perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding contenido-perfil">
+
+  <ion-spinner name="crescent" *ngIf="cargando" style="display: block; margin: 2rem auto;"></ion-spinner>
+
+  <ion-card class="tarjeta-perfil" *ngIf="!cargando">
     <ion-card-header>
-      <ion-card-title>Mi Perfil</ion-card-title>
+      <ion-card-title class="titulo-perfil">Información personal</ion-card-title>
     </ion-card-header>
+
     <ion-card-content>
-      <ion-item>
-        <ion-label position="stacked">Nombre</ion-label>
-        <ion-input [(ngModel)]="nombre"></ion-input>
+      <ion-item class="campo-perfil">
+        <ion-label position="floating">Nombre</ion-label>
+        <ion-input [(ngModel)]="nombre" type="text"></ion-input>
       </ion-item>
 
-      <ion-item>
-        <ion-label position="stacked">Correo electrónico</ion-label>
-        <ion-input [(ngModel)]="correo"></ion-input>
+      <ion-item class="campo-perfil">
+        <ion-label position="floating">Correo electrónico</ion-label>
+        <ion-input [(ngModel)]="correo" type="text"></ion-input>
       </ion-item>
 
-      <ion-button expand="full" (click)="guardarCambios()">Guardar Cambios</ion-button>
+      <ion-button expand="full" color="primary" (click)="guardarCambios()" class="boton-guardar ion-margin-top">
+        Guardar cambios
+      </ion-button>
     </ion-card-content>
   </ion-card>
 </ion-content>
-

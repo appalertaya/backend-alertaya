@@ -35,9 +35,9 @@ const valorarReporte = (req, res) => {
 
       const utiles = Number(resultados[0].utiles || 0);
       const noUtiles = Number(resultados[0].no_utiles || 0);
-      const umbral = 1;
+      const umbral = 5;
 
-      // Solo es confiable si hay al menos 3 útiles y más que los no útiles
+      // Solo es confiable si hay al menos 5 útiles y más que los no útiles
       const esConfiable = utiles >= umbral && utiles > noUtiles ? 1 : 0;
 
       const sqlUpdate = `UPDATE reportes SET esConfiable = ? WHERE id = ?`;

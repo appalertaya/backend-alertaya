@@ -20,11 +20,14 @@
     <ion-item *ngFor="let item of datos">
       <ion-label>
         <h2>{{ item.categoria }}</h2>
+        <p *ngIf="totalReportes > 0">Participación: {{ calcularPorcentaje(item.cantidad) }}</p>
       </ion-label>
       <div slot="end" style="font-size: 1.8rem; font-weight: bold; color: var(--ion-color-primary);">
         {{ item.cantidad }}
       </div>
     </ion-item>
+
+
   </ion-list>
 
   <div *ngIf="!cargando && datos.length === 0" class="ion-text-center">

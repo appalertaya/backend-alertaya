@@ -1,7 +1,80 @@
-ion-content,
 html,
 body,
+ion-content,
 ion-app {
-  --background: var(--ion-background-color, #ffffff) !important;
-  background: var(--ion-background-color, #ffffff) !important;
+  --background: var(--ion-background-color, #121212) !important;
+  background: var(--ion-background-color, #121212) !important;
+}
+
+ion-item {
+  --background: #1f1f1f;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  --color: #ccc;
+}
+
+ion-label {
+  color: #ccc;
+  font-weight: bold;
+}
+
+ion-select {
+  color: #fff;
+  font-weight: 500;
+}
+
+ion-card {
+  background: #1e1e1e;
+  color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+}
+
+ion-card-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+}
+
+ion-card-subtitle {
+  font-size: 13px;
+  color: #aaa;
+}
+
+ion-card-content p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #ccc;
+}
+
+ion-chip {
+  margin: 8px;
+  font-weight: 500;
+}
+
+ion-chip[color='primary'] {
+  --background: #2a3cff;
+  color: #fff;
+}
+
+ion-chip[color='success'] {
+  --background: #2e7d32;
+  color: #fff;
+}
+
+ion-chip[color='warning'] {
+  --background: #f9a825;
+  color: #000;
+}
+
+ion-button[color='danger'] {
+  margin-left: 4px;
+  --color: #e53935;
+}
+
+ion-spinner {
+  color: #3880ff;
+  margin-top: 24px;
 }

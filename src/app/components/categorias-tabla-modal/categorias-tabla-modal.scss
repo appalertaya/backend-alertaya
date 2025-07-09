@@ -1,4 +1,39 @@
+ion-content,
+html,
+body,
+ion-app {
+  --background: #121212 !important;
+  background: #121212 !important;
+  color: #ffffff;
+}
+
+ion-toolbar {
+  --background: #1e1e1e;
+  --color: #ffffff;
+}
+
+ion-title {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
 ion-item {
-  --padding-start: 12px;
-  --inner-padding-end: 12px;
+  --background: #1f1f1f;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  padding: 10px;
+}
+
+ion-label h2 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.cantidad-numero {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--ion-color-primary);
+  padding-right: 4px;
 }

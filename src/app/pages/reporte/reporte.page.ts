@@ -44,11 +44,12 @@ export class ReportePage {
       const conexionOk = await this.permisosService.verificarConexionInternet('Se requiere conexión a internet');
 
       if (!gpsOk || !conexionOk) {
-        this.error = 'Debes activar el GPS y tener conexión a internet para continuar.';
+        this.error = 'Debes activar la ubicación (GPS) y tu conexión a internet para continuar.';
         return;
       }
 
-      // para sincronizar reportes pendientes 
+      // ESTA FUNCION NO ESTA IMPLEMENTADA DEL TODO YA QUE FALTA ANADIR COMO GUARDAR LAS IMAGENES LOCALMENTE PARA ENVIARLAS DESPUES PORQUE NO PUEDE IR SIN IMAGENES
+      // para sincronizar reportes pendientes
       // const sincronizar = this.reporteService.sincronizarReportesPendientes();
       // if (await sincronizar) {
       //   this.mostrarMensaje('Reportes pendientes sincronizados con éxito.', 'success')
@@ -110,8 +111,10 @@ export class ReportePage {
     }
 
     const gpsOk = await this.permisosService.verificarGPSyPermisos();
-    if (!gpsOk) {
-      this.mostrarMensaje('Debes activar el GPS para enviar un reporte.', 'danger');
+    const conexionOk = await this.permisosService.verificarConexionInternet('Se requiere conexión a internet');
+    
+    if (!gpsOk || !conexionOk) {
+      this.mostrarMensaje('Ocurrió un error. Verifica tu ubicación (GPS) y tu conexión a internet.', 'danger');
       return;
     }
 

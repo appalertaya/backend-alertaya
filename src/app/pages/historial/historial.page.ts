@@ -16,7 +16,7 @@ export class HistorialPage implements OnInit {
   error: string = '';
   conexionLista: boolean = false;
   cargando: boolean = true;
-  pendientesLocales: Reporte[] = [];
+  // pendientesLocales: Reporte[] = [];
   apiFallo: boolean = false;
 
   categorias: string[] = [
@@ -56,7 +56,7 @@ export class HistorialPage implements OnInit {
 
       this.conexionLista = true;
       this.apiFallo = false;
-      this.pendientesLocales = [];
+      // this.pendientesLocales = [];
 
       const reportesApi = await this.reporteService.getMisReportes();
       this.reportes = reportesApi.sort((a, b) => new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime());
@@ -67,8 +67,8 @@ export class HistorialPage implements OnInit {
       this.mostrarMensaje('No se pudo cargar tu historial. Verifica tu conexión.', 'warning');
 
       // Cargar reportes pendientes locales si hay
-      const locales = await this.reporteService.getReportesLocales();
-      this.pendientesLocales = locales.filter(r => !r.enviado);
+      // const locales = await this.reporteService.getReportesLocales();
+      // this.pendientesLocales = locales.filter(r => !r.enviado);
     } finally {
       this.cargando = false;
     }

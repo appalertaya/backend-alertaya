@@ -63,10 +63,6 @@
           Enviado
         </ion-chip>
 
-        <ion-chip color="warning" *ngIf="!reporte.enviado">
-          <ion-icon name="time-outline" color="light" slot="start"></ion-icon>
-          Pendiente
-        </ion-chip>
       </ion-card-content>
     </ion-card>
 
@@ -76,7 +72,7 @@
   </ion-content>
 
   <!-- Reportes pendientes si la API falla -->
-  <ng-container *ngIf="apiFallo && pendientesLocales.length > 0">
+  <!-- <ng-container *ngIf="apiFallo && pendientesLocales.length > 0">
     <ion-card>
       <ion-card-header>
         <ion-card-title color="warning">Reportes pendientes de envío</ion-card-title>
@@ -99,6 +95,6 @@
         <p><strong>Lat:</strong> {{ reporte.lat }} <strong>Lng:</strong> {{ reporte.lng }}</p>
       </ion-card-content>
     </ion-card>
-  </ng-container>
+  </ng-container> -->
 
 </ion-content>

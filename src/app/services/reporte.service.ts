@@ -64,7 +64,7 @@ export class ReporteService {
       reportesLocales.push(nuevoReporte);
 
     } catch (error: any) {
-      console.warn('⚠️ No se pudo enviar el reporte al backend. Guardando localmente.', error);
+      this.mostrarMensaje('Se produjo un error, no se pudo enviar el reporte.', 'danger');
       nuevoReporte.enviado = false;
       reportesLocales.push(nuevoReporte);
     }
@@ -103,10 +103,10 @@ export class ReporteService {
     return this.http.get<Reporte[]>(this.apiUrl, { params: httpParams });
   }
 
-  async getReportesLocales(): Promise<Reporte[]> {
-    const { value } = await Preferences.get({ key: this.STORAGE_KEY });
-    return value ? JSON.parse(value) : [];
-  }
+  // async getReportesLocales(): Promise<Reporte[]> {
+  //   const { value } = await Preferences.get({ key: this.STORAGE_KEY });
+  //   return value ? JSON.parse(value) : [];
+  // }
 
   async limpiarReportes(): Promise<void> {
     await Preferences.remove({ key: this.STORAGE_KEY });

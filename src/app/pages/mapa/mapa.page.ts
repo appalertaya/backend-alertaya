@@ -206,9 +206,11 @@ export class MapaPage implements AfterViewInit {
 
         if (rep.esConfiable === 1) {
           confiabilidad = 'confiable';
-        } else if (rep.esConfiable === 0) {
+        } else if (rep.esConfiable === 0 && rep.valoraciones_utiles + rep.valoraciones_no_utiles > 0) {
+          // Solo mostrar "no confiable" si tiene valoraciones
           confiabilidad = 'no_confiable';
         }
+
 
         const iconUrl = this.getIconoPorCategoria(rep.categoria, confiabilidad);
 

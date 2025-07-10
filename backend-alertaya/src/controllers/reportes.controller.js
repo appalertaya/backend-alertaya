@@ -253,6 +253,9 @@ const eliminarReporte = async (req, res) => {
     // 3. Eliminar registros de imágenes en BD
     await db.promise().query('DELETE FROM ImagenesReporte WHERE id_reporte = ?', [id]);
 
+    // Eliminar valoraciones asociadas
+    await db.promise().query('DELETE FROM valoraciones WHERE reporte_id = ?', [id]);
+
     // 4. Eliminar el reporte
     const [result] = await db.promise().query('DELETE FROM reportes WHERE id = ?', [id]);
 

@@ -28,3 +28,15 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🟢 Servidor corriendo en http://0.0.0.0:${PORT}`);
 });
+
+const multer = require('multer');
+
+// Middleware para manejar errores de Multer
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'Uno de los archivos excede el límite de 5MB.' });
+    }
+  }
+  next(err);
+});

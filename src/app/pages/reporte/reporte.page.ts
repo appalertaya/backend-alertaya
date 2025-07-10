@@ -112,7 +112,7 @@ export class ReportePage {
 
     const gpsOk = await this.permisosService.verificarGPSyPermisos();
     const conexionOk = await this.permisosService.verificarConexionInternet('Se requiere conexión a internet');
-    
+
     if (!gpsOk || !conexionOk) {
       this.mostrarMensaje('Ocurrió un error. Verifica tu ubicación (GPS) y tu conexión a internet.', 'danger');
       return;
@@ -131,10 +131,21 @@ export class ReportePage {
       const ciudad = await this.geoService.obtenerCiudad(ubicacionActual.lat, ubicacionActual.lon);
       const fechaHora = new Date().toISOString().split('.')[0];
 
+      // Validar tamaño de imágenes (máximo 5MB cada una)
+      for (const img of this.imagenes) {
+        console.log("tamaño imagen ", img, " : ", img.size)
+        if (img.size > 5 * 1024 * 1024) {
+          this.mostrarMensaje('Una de las imágenes pesa más de 5MB. Por favor selecciona imágenes más livianas.', 'warning');
+          return;
+        }
+      }
+
       const formData = new FormData();
       formData.append('descripcion', this.descripcion);
-      formData.append('lat', String(ubicacionActual.lat));
-      formData.append('lng', String(ubicacionActual.lon));
+      // formData.append('lat', String(ubicacionActual.lat));
+      // formData.append('lng', String(ubicacionActual.lon));
+      formData.append('lat', String(-35.433954));
+      formData.append('lng', String(-71.620726));
       formData.append('ciudad', ciudad || 'Desconocida');
       formData.append('fechaHora', fechaHora);
       formData.append('enviado', 'true');

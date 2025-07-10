@@ -129,69 +129,69 @@ export class ReporteService {
 
 
   // Sincronizar reportes pendientes
-  async sincronizarReportesPendientes(): Promise<boolean> {
-    try {
-      const { value } = await Preferences.get({ key: this.STORAGE_KEY });
-      let reportes: Reporte[] = value ? JSON.parse(value) : [];
+  // async sincronizarReportesPendientes(): Promise<boolean> {
+  //   try {
+  //     const { value } = await Preferences.get({ key: this.STORAGE_KEY });
+  //     let reportes: Reporte[] = value ? JSON.parse(value) : [];
 
-      console.log("reportes a sincronizar: ", reportes)
+  //     console.log("reportes a sincronizar: ", reportes)
 
-      // Obtener correo del usuario actual
-      const { value: userEmail } = await Preferences.get({ key: 'email' });
-      const correoActual = userEmail ?? undefined;
+  //     // Obtener correo del usuario actual
+  //     const { value: userEmail } = await Preferences.get({ key: 'email' });
+  //     const correoActual = userEmail ?? undefined;
 
-      if (!correoActual) {
-        console.warn('No hay usuario autenticado, no se sincronizan reportes');
-        return false;
-      }
+  //     if (!correoActual) {
+  //       console.warn('No hay usuario autenticado, no se sincronizan reportes');
+  //       return false;
+  //     }
 
-      // Filtrar solo reportes pendientes del usuario actual
-      const pendientes = reportes.filter(r => !r.enviado && r.creadorEmail === correoActual);
-      if (pendientes.length === 0) return false;
+  //     // Filtrar solo reportes pendientes del usuario actual
+  //     const pendientes = reportes.filter(r => !r.enviado && r.creadorEmail === correoActual);
+  //     if (pendientes.length === 0) return false;
 
-      const { value: token } = await Preferences.get({ key: 'token' });
-      const headers = new HttpHeaders({
-        Authorization: `Bearer ${token}`
-      });
-      // console.log('Authorization Header:', headers.get('Authorization'));
+  //     const { value: token } = await Preferences.get({ key: 'token' });
+  //     const headers = new HttpHeaders({
+  //       Authorization: `Bearer ${token}`
+  //     });
+  //     // console.log('Authorization Header:', headers.get('Authorization'));
 
-      console.log(`Intentando sincronizar ${pendientes.length} reporte(s) pendiente(s) del usuario ${correoActual}...`);
+  //     console.log(`Intentando sincronizar ${pendientes.length} reporte(s) pendiente(s) del usuario ${correoActual}...`);
 
-      for (const r of pendientes) {
-        try {
-          await this.http.post(this.apiUrl, r, { headers }).toPromise();
+  //     for (const r of pendientes) {
+  //       try {
+  //         await this.http.post(this.apiUrl, r, { headers }).toPromise();
 
-          // Buscar el índice real en el array 'reportes' y actualizarlo
-          const index = reportes.findIndex(orig =>
-            orig.fechaHora === r.fechaHora &&
-            orig.lat === r.lat &&
-            orig.lng === r.lng &&
-            orig.descripcion === r.descripcion
-          );
+  //         // Buscar el índice real en el array 'reportes' y actualizarlo
+  //         const index = reportes.findIndex(orig =>
+  //           orig.fechaHora === r.fechaHora &&
+  //           orig.lat === r.lat &&
+  //           orig.lng === r.lng &&
+  //           orig.descripcion === r.descripcion
+  //         );
 
-          if (index !== -1) {
-            reportes[index].enviado = true;
-            console.log('Reporte sincronizado:', reportes[index].fechaHora);
-          }
-        } catch (err) {
-          console.warn('No se pudo sincronizar reporte:', r.fechaHora, ' Error: ', err);
-        }
-      }
+  //         if (index !== -1) {
+  //           reportes[index].enviado = true;
+  //           console.log('Reporte sincronizado:', reportes[index].fechaHora);
+  //         }
+  //       } catch (err) {
+  //         console.warn('No se pudo sincronizar reporte:', r.fechaHora, ' Error: ', err);
+  //       }
+  //     }
 
-      // Eliminar reportes que ya fueron sincronizados (enviados = true)
-      const noEnviados = reportes.filter(r => !r.enviado);
+  //     // Eliminar reportes que ya fueron sincronizados (enviados = true)
+  //     const noEnviados = reportes.filter(r => !r.enviado);
 
-      await Preferences.set({
-        key: this.STORAGE_KEY,
-        value: JSON.stringify(noEnviados)
-      });
+  //     await Preferences.set({
+  //       key: this.STORAGE_KEY,
+  //       value: JSON.stringify(noEnviados)
+  //     });
 
-      return true;
-    } catch (error) {
-      console.warn('Ocurrió un error al sincronizar los reportes: ', error)
-      return false;
-    }
-  }
+  //     return true;
+  //   } catch (error) {
+  //     console.warn('Ocurrió un error al sincronizar los reportes: ', error)
+  //     return false;
+  //   }
+  // }
 
   // get reportes por usuario 
   async getMisReportes(): Promise<Reporte[]> {
